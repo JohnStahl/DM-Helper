@@ -1,5 +1,10 @@
 <resources>
     <string name="app_name">DM Helper</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="host_url">https://dm-helper.netlify.app</string>
+    <string name="redirect_url">https://dm-helper.netlify.app</string>
+    <string name="auth_end_point">https://warhorn.net/oauth/authorize</string>
+    <string name="token_end_point">https://warhorn.net/oauth/token</string>
+    <string name="client_id">GiYdEfTzuFFw2WYLEi67GXyd</string>
+    <string name="access_token">VT9oeVDJxbAAi4xfCN9bH8BD</string>
+    <string name="warhorn_auth_action">auth</string>
 </resources>
