@@ -2,6 +2,7 @@ package edu.temple.dmhelper;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import android.app.PendingIntent;
 import android.content.Intent;
@@ -25,6 +26,7 @@ public class MainActivity extends AppCompatActivity implements WarhornFragment.W
     private static final String TAG = "Main Activity";
     private static final int RC_AUTH = 2;
 
+    Fragment warhornFragment;
     AuthState authState;
 
     @Override
@@ -32,18 +34,27 @@ public class MainActivity extends AppCompatActivity implements WarhornFragment.W
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Grabs Warhorn fragment and creates new instance if necessary
+        warhornFragment = getSupportFragmentManager().findFragmentById(R.id.Container);
+        if(!(warhornFragment instanceof WarhornFragment)){
+            warhornFragment = WarhornFragment.newInstance();
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.Container, warhornFragment)
+                    .commit();
+        }
+
         authState = new AuthState();
-
-        findViewById(R.id.warhorn_test).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                authorize();
-            }
-        });
-
         handleIntent(getIntent());
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        handleIntent(intent);
+    }
+
+    //Handles various intents; mostly used for handling authorization responses
     public void handleIntent(Intent intent){
         if(intent.getAction().equals(Intent.ACTION_MAIN))
             return;
@@ -65,6 +76,7 @@ public class MainActivity extends AppCompatActivity implements WarhornFragment.W
         }
     }
 
+    //Grabs user token and stores it in authState from successful authorization response
     public void getUserToken(AuthorizationResponse response){
         AuthorizationService authService = new AuthorizationService(this);
         authService.performTokenRequest(
@@ -100,6 +112,7 @@ public class MainActivity extends AppCompatActivity implements WarhornFragment.W
         return request;
     }
 
+    //Called by warhorn fragment to initialize login by user into their warhorn fragment
     @Override
     public void authorize() {
         //Uses service to submit request

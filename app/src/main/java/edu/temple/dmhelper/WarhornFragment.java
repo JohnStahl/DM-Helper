@@ -60,7 +60,16 @@ public class WarhornFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_warhorn, container, false);
+        View view = inflater.inflate(R.layout.fragment_warhorn, container, false);
+        // Adds listener to login button that starts login process when button is clicked
+        view.findViewById(R.id.warhorn_login).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.authorize();
+            }
+        });
+
+        return view;
     }
 
     public interface WarhornInterface{
