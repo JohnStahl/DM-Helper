@@ -57,4 +57,14 @@ public class BluetoothDeviceAdapter extends BaseAdapter {
         this.devices.add(device);
         notifyDataSetChanged();
     }
+
+    public void addAllDevices(Collection<BluetoothDevice> devices) {
+        this.devices.addAll(devices);
+        notifyDataSetChanged();
+    }
+
+    public void resetDevices() {
+        this.devices.clear();
+        notifyDataSetInvalidated();
+    }
 }

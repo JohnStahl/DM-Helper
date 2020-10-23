@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -19,7 +20,10 @@ import android.widget.TextView;
 import edu.temple.dmhelper.R;
 
 public class DiscoveryActivity extends AppCompatActivity {
-    public static final String EXTRA_DEVICE = "device";
+    private static final String TAG = "DiscoveryActivity";
+
+    public static final String ACTION_DEVICE_SELECTED = "edu.temple.dmhelper.discovery.action.DEVICE_SELECTED";
+    public static final String EXTRA_DEVICE = "edu.temple.dmhelper.discovery.extra.DEVICE";
     private BluetoothAdapter btAdapter = null;
 
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -37,6 +41,7 @@ public class DiscoveryActivity extends AppCompatActivity {
 
     private TextView title;
     private ProgressBar progressBar;
+    private Button refreshButton;
 
     private BluetoothDeviceAdapter deviceAdapter;
 
@@ -45,14 +50,26 @@ public class DiscoveryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_discovery);
         setResult(RESULT_CANCELED);
-        registerReceiver(receiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
-        registerReceiver(receiver, new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED));
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(BluetoothDevice.ACTION_FOUND);
+        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+        registerReceiver(receiver, filter);
 
         btAdapter = BluetoothAdapter.getDefaultAdapter();
         deviceAdapter = new BluetoothDeviceAdapter(btAdapter.getBondedDevices());
 
         title = findViewById(R.id.discoverTitle);
         progressBar = findViewById(R.id.progressBar);
+
+        refreshButton = findViewById(R.id.refreshButton);
+        refreshButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                resetDeviceList();
+                startDiscovery();
+            }
+        });
 
         Button cancelButton = findViewById(R.id.cancelButton);
         cancelButton.setOnClickListener(new View.OnClickListener() {
@@ -69,7 +86,7 @@ public class DiscoveryActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 stopDiscovery();
-                Intent intent = new Intent();
+                Intent intent = new Intent(ACTION_DEVICE_SELECTED);
                 intent.putExtra(EXTRA_DEVICE, deviceAdapter.getItem(position));
                 setResult(RESULT_OK, intent);
                 finish();
@@ -86,18 +103,27 @@ public class DiscoveryActivity extends AppCompatActivity {
         unregisterReceiver(receiver);
     }
 
+    private void resetDeviceList() {
+        deviceAdapter.resetDevices();
+        deviceAdapter.addAllDevices(btAdapter.getBondedDevices());
+    }
+
     private void startDiscovery() {
         progressBar.setVisibility(View.VISIBLE);
+        refreshButton.setVisibility(View.GONE);
         title.setText(R.string.bluetooth_discovering);
 
         if (btAdapter.isDiscovering())
             btAdapter.cancelDiscovery();
 
+        Log.d(TAG, "Discovering devices");
         btAdapter.startDiscovery();
     }
 
     private void stopDiscovery() {
+        Log.d(TAG, "Cancelling discovery");
         progressBar.setVisibility(View.GONE);
+        refreshButton.setVisibility(View.VISIBLE);
 
         title.setText(deviceAdapter.getCount() < 1 ?
                 R.string.bluetooth_no_devices : R.string.bluetooth_finished_discover);
@@ -107,10 +133,12 @@ public class DiscoveryActivity extends AppCompatActivity {
     }
 
     private void onDeviceDiscovered(BluetoothDevice device) {
+        Log.d(TAG, "Discovered new device: " + device.toString());
         deviceAdapter.addDevice(device);
     }
 
     private void onDiscoveryComplete() {
+        Log.d(TAG, "Discovery complete");
         stopDiscovery();
     }
 }
