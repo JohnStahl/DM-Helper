@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity{
                 getString(R.string.client_id),
                 ResponseTypeValues.CODE,
                 Uri.parse(getString(R.string.redirect_url))
-        ).build();
+        ).setScopes("openid", "profile", "email").build();
         return request;
     }
 
