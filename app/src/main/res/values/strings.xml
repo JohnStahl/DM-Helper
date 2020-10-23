@@ -8,4 +8,12 @@
     <string name="bluetooth_discovering">Discovering Devices…</string>
     <string name="bluetooth_finished_discover">Select the DM\'s device</string>
     <string name="bluetooth_no_devices">Unable to find any devices to connect to</string>
+    <string name="bluetooth_failed_to_enable">Unable to enable bluetooth</string>
+
+    <string name="cannot_request_location">Unable to discover devices without location permissions</string>
+    <string name="location_rationale_title">Oops!</string>
+    <string name="location_rationale_message">
+        We are required to ask for location permissions to discover nearby devices. Without this
+        permission we are unable to find the DM\'s device to establish a connection.
+    </string>
 </resources>
