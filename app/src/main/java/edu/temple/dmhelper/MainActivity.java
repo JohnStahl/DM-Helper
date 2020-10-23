@@ -22,77 +22,20 @@ import net.openid.appauth.TokenResponse;
 
 import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
 
-public class MainActivity extends AppCompatActivity implements WarhornFragment.WarhornInterface {
+public class MainActivity extends AppCompatActivity{
     private static final String TAG = "Main Activity";
-    private static final int RC_AUTH = 2;
-
-    Fragment warhornFragment;
-    AuthState authState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Grabs Warhorn fragment and creates new instance if necessary
-        warhornFragment = getSupportFragmentManager().findFragmentById(R.id.Container);
-        if(!(warhornFragment instanceof WarhornFragment)){
-            warhornFragment = WarhornFragment.newInstance();
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .add(R.id.Container, warhornFragment)
-                    .commit();
-        }
-
-        authState = new AuthState();
-        handleIntent(getIntent());
-    }
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        handleIntent(intent);
-    }
-
-    //Handles various intents; mostly used for handling authorization responses
-    public void handleIntent(Intent intent){
-        if(intent.getAction().equals(Intent.ACTION_MAIN))
-            return;
-
-        if(intent.getAction().equals((Intent.ACTION_VIEW))){
-            Log.d(TAG, intent.getData().toString());
-            AuthorizationResponse.Builder builder = new AuthorizationResponse.Builder(generateRequest());
-            AuthorizationResponse response = builder.fromUri(intent.getData()).build();
-            if(response == null){
-                AuthorizationException exception = AuthorizationException.fromOAuthRedirect(intent.getData());
-                if(exception == null)
-                    Log.d(TAG, "Response from server is null");
-                else
-                    Log.e(TAG, "Registration failed with following error: " + exception.toString());
-            }else{
-                authState.update(response, null);
-                getUserToken(response);
+        findViewById(R.id.warhorn_login).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                authorize();
             }
-        }
-    }
-
-    //Grabs user token and stores it in authState from successful authorization response
-    public void getUserToken(AuthorizationResponse response){
-        AuthorizationService authService = new AuthorizationService(this);
-        authService.performTokenRequest(
-                response.createTokenExchangeRequest(),
-                new AuthorizationService.TokenResponseCallback() {
-                    @Override public void onTokenRequestCompleted(TokenResponse token, AuthorizationException ex) {
-                        if (token != null) {
-                            // token obtained
-                            authState.update(token, ex);
-                            Log.d(TAG, "Obtained following access token: " + authState.getAccessToken());
-                        } else {
-                            // authorization failed
-                            Log.e(TAG, "Token exchanged failed with following error: " + ex.toString());
-                        }
-                    }
-                });
+        });
     }
 
     //Creates request to warhorn for authorization
@@ -113,11 +56,11 @@ public class MainActivity extends AppCompatActivity implements WarhornFragment.W
     }
 
     //Called by warhorn fragment to initialize login by user into their warhorn fragment
-    @Override
     public void authorize() {
         //Uses service to submit request
         AuthorizationService service = new AuthorizationService(this);
-        Intent authIntent = service.getAuthorizationRequestIntent(generateRequest());
-        startActivityForResult(authIntent, RC_AUTH);
+        Intent intent = new Intent(this, WarhornActivity.class);
+        PendingIntent pi = PendingIntent.getActivity(this, 0, intent, FLAG_UPDATE_CURRENT);
+        service.performAuthorizationRequest(generateRequest(), pi);
     }
 }
