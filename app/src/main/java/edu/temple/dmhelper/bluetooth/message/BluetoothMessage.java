@@ -2,10 +2,10 @@ package edu.temple.dmhelper.bluetooth.message;
 
 import java.io.Serializable;
 
-public abstract class Message implements Serializable {
+public abstract class BluetoothMessage implements Serializable {
     private final String type;
 
-    public Message(String type) {
+    public BluetoothMessage(String type) {
         this.type = type;
     }
 

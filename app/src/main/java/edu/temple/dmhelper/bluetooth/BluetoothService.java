@@ -4,16 +4,22 @@ import android.app.Service;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
 
-import edu.temple.dmhelper.bluetooth.message.Message;
+import java.util.UUID;
+
+import edu.temple.dmhelper.bluetooth.message.BluetoothMessage;
 
 public class BluetoothService extends Service {
+    public static final UUID SELF_ID = UUID.randomUUID();
+
     public BluetoothService() {
     }
 
     class BluetoothServiceBinder extends Binder {
-        void startServer() {
+        void startServer(Handler handler) {
+            BluetoothService.this.handler = handler;
             BluetoothService.this.startServer();
         }
 
@@ -25,15 +31,16 @@ public class BluetoothService extends Service {
             BluetoothService.this.stopServer();
         }
 
-        void broadcastMessage(Message message) {
+        void broadcastMessage(BluetoothMessage message) {
             BluetoothService.this.broadcastMessage(message);
         }
 
-        void connectToServer(BluetoothDevice device) {
+        void connectToServer(BluetoothDevice device, Handler handler) {
+            BluetoothService.this.handler = handler;
             BluetoothService.this.connectToServer(device);
         }
 
-        void sendToServer(Message message) {
+        void sendToServer(BluetoothMessage message) {
             BluetoothService.this.sendToServer(message);
         }
 
@@ -41,6 +48,8 @@ public class BluetoothService extends Service {
             BluetoothService.this.disconnect();
         }
     }
+
+    private Handler handler;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -59,7 +68,7 @@ public class BluetoothService extends Service {
 
     }
 
-    void broadcastMessage(Message message) {
+    void broadcastMessage(BluetoothMessage message) {
 
     }
 
@@ -67,7 +76,7 @@ public class BluetoothService extends Service {
 
     }
 
-    void sendToServer(Message message) {
+    void sendToServer(BluetoothMessage message) {
 
     }
 
