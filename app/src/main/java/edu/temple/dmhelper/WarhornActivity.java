@@ -26,6 +26,7 @@ import net.openid.appauth.ClientAuthentication;
 import net.openid.appauth.ResponseTypeValues;
 import net.openid.appauth.TokenResponse;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -46,6 +47,11 @@ public class WarhornActivity extends AppCompatActivity {
         authState = new AuthState();
 
         handleIntent(getIntent());
+
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.Event_Info, new EventInfoFragment())
+                .commit();
     }
 
     public void getUserInfo(){
@@ -82,7 +88,18 @@ public class WarhornActivity extends AppCompatActivity {
     }
 
     private void updateUI(JSONObject userInfo){
-        Log.d(TAG, userInfo.toString());
+        try {
+            String name = userInfo.getString("name");
+            String email = userInfo.getString("email");
+            String pictureURL = userInfo.getString("picture");
+            UserInfoFragment fragment = UserInfoFragment.newInstance(name, email, pictureURL);
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.Profile_Info, fragment)
+                    .commit();
+        } catch (JSONException e) {
+            Log.e(TAG, "Obtained user info object is invalid");
+        }
     }
 
     //Extracts Authorization response from intent and sends to getUserToken()
