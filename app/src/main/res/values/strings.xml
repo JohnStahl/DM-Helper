@@ -11,6 +11,5 @@
     <string name="client_id">GiYdEfTzuFFw2WYLEi67GXyd</string>
     <string name="access_token">VT9oeVDJxbAAi4xfCN9bH8BD</string>
     <string name="warhorn_auth_action">auth</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="already_authenticated">true</string>
 </resources>

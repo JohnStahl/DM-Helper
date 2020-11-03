@@ -15,23 +15,57 @@ import com.apollographql.apollo.ApolloClient;
 import com.apollographql.apollo.api.Response;
 import com.apollographql.apollo.exception.ApolloException;
 
+import net.openid.appauth.AuthState;
+
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONException;
+
+import java.io.IOException;
+
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 
 public class EventInfoFragment extends Fragment {
     private static final String TAG = "Event Fragment";
 
-    ApolloClient apolloClient;
+    private static final String ACCESS_TOKEN = "token";
+
+    ApolloClient apolloClient; //Used to make GraphQL queries and mutations to warhorn
+    String accessToken; //Authentication token for warhorn
 
     public EventInfoFragment() {
         // Required empty public constructor
     }
 
+    public static EventInfoFragment NewInstance(String accessToken){
+        EventInfoFragment fragment = new EventInfoFragment();
+        Bundle args = new Bundle();
+        args.putString(ACCESS_TOKEN, accessToken);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //Adds authorization interceptor to apollo client
+        OkHttpClient.Builder authBuilder = new OkHttpClient.Builder();
+        OkHttpClient authClient = authBuilder
+                .addInterceptor(new AuthorizationInterceptor())
+                .build();
+
+        //Initalizes the apollo client with warhorn's graphql endpoint
         apolloClient = ApolloClient.builder()
                 .serverUrl(getString(R.string.graphql_end_point))
+                .okHttpClient(authClient)
                 .build();
+        if(getArguments() != null){
+            accessToken = getArguments().getString(ACCESS_TOKEN);
+        }else{
+            Log.e(TAG, "Fragment requires Authentication to operate");
+        }
     }
 
     @Override
@@ -61,5 +95,18 @@ public class EventInfoFragment extends Fragment {
                         Log.e("Apollo", "Error", e);
                     }
                 });
+    }
+
+    //Class used to add authorization to each graphql query/mutation
+    private class AuthorizationInterceptor implements Interceptor{
+        @Override
+        public okhttp3.Response intercept(Chain chain) throws IOException {
+            //Adds authentication to our queries/mutations
+            Request request = chain.request().newBuilder()
+                    .addHeader("Authorization", "bearer " + accessToken)
+                    .build();
+
+            return chain.proceed(request);
+        }
     }
 }

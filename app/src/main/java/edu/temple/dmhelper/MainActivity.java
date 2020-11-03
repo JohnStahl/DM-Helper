@@ -20,6 +20,8 @@ import net.openid.appauth.AuthorizationServiceConfiguration;
 import net.openid.appauth.ResponseTypeValues;
 import net.openid.appauth.TokenResponse;
 
+import org.json.JSONException;
+
 import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
 
 public class MainActivity extends AppCompatActivity{
@@ -33,7 +35,11 @@ public class MainActivity extends AppCompatActivity{
         findViewById(R.id.warhorn_login).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                authorize();
+                try {
+                    authorize();
+                } catch (JSONException e) {
+                    Log.d(TAG, "JSON error during authorization");
+                }
             }
         });
     }
@@ -56,11 +62,18 @@ public class MainActivity extends AppCompatActivity{
     }
 
     //Called by warhorn fragment to initialize login by user into their warhorn fragment
-    public void authorize() {
+    public void authorize() throws JSONException {
         //Uses service to submit request
-        AuthorizationService service = new AuthorizationService(this);
-        Intent intent = new Intent(this, WarhornActivity.class);
-        PendingIntent pi = PendingIntent.getActivity(this, 0, intent, FLAG_UPDATE_CURRENT);
-        service.performAuthorizationRequest(generateRequest(), pi);
+        AuthState authState = AuthManager.readAuthState(this);
+        if(authState == null) {
+            AuthorizationService service = new AuthorizationService(this);
+            Intent intent = new Intent(this, WarhornActivity.class);
+            PendingIntent pi = PendingIntent.getActivity(this, 0, intent, FLAG_UPDATE_CURRENT);
+            service.performAuthorizationRequest(generateRequest(), pi);
+        }else{
+            Intent intent = new Intent(this, WarhornActivity.class);
+            intent.setAction(getString(R.string.already_authenticated));
+            startActivity(intent);
+        }
     }
 }

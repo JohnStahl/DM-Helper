@@ -4,6 +4,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -42,18 +43,28 @@ public class WarhornActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_warhorn);
+    }
 
-        authService = new AuthorizationService(this);
-        authState = new AuthState();
-
+    @Override
+    protected void onResume() {
+        super.onResume();
         handleIntent(getIntent());
 
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(R.id.Event_Info, new EventInfoFragment())
+                .add(R.id.Event_Info, EventInfoFragment.NewInstance(authState.getAccessToken()))
                 .commit();
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        AuthManager.writeAuthState(this, authState);
+        authState = null;
+        authService.dispose();
+    }
+
+    //Using obtained access token requests user info from warhorn and updates UI with response
     public void getUserInfo(){
         authState.performActionWithFreshTokens(authService, new AuthState.AuthStateAction() {
             @Override
@@ -64,17 +75,20 @@ public class WarhornActivity extends AppCompatActivity {
                         null, new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
+                        //Successful request and we should update UI with newly obtained user info
                         Log.d(TAG, "Got response from warhorn");
                         updateUI(response);
                     }
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        //Unsuccessful request, so we log the error
                         Log.e(TAG, "Failed to get user info because: " + error.toString());
                     }
                 }){
                     @Override
                     public Map<String, String> getHeaders() throws AuthFailureError {
+                        //Adds access token to request
                         Map<String, String> headers = new HashMap<>();
                         headers.put("Authorization", "bearer " + accessToken);
                         Log.d(TAG, headers.toString());
@@ -87,6 +101,8 @@ public class WarhornActivity extends AppCompatActivity {
         });
     }
 
+    //First pulls relevant information from user info response
+    //Then creates new user info fragment with relevant information
     private void updateUI(JSONObject userInfo){
         try {
             String name = userInfo.getString("name");
@@ -105,6 +121,8 @@ public class WarhornActivity extends AppCompatActivity {
     //Extracts Authorization response from intent and sends to getUserToken()
     public void handleIntent(Intent intent){
         if(intent.getAction().equals((Intent.ACTION_VIEW))){
+            authState = new AuthState();
+            authService = new AuthorizationService(this);
             Log.d(TAG, intent.getData().toString());
             AuthorizationResponse.Builder builder = new AuthorizationResponse.Builder(generateRequest());
             AuthorizationResponse response = builder.fromUri(intent.getData()).build();
@@ -118,10 +136,21 @@ public class WarhornActivity extends AppCompatActivity {
                 authState.update(response, null);
                 getUserToken(response);
             }
+        }else{
+            Log.d(TAG, "Getting pre-existing authorization");
+            try {
+                authState = AuthManager.readAuthState(this);
+            } catch (JSONException e) {
+                Log.e(TAG, "Authstate not properly formatted");
+                authState = new AuthState();
+            }
+            authService = new AuthorizationService(this);
+            getUserInfo();
         }
     }
 
     //Grabs user token and stores it in authState from successful authorization response
+    //Then calls getUserInfo() to use acquired token to obtain relevant user information
     public void getUserToken(AuthorizationResponse response){
         authService.performTokenRequest(
                 response.createTokenExchangeRequest(),
