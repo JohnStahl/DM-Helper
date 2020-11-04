@@ -17,6 +17,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.apollographql.apollo.ApolloCall;
+import com.apollographql.apollo.ApolloClient;
+import com.apollographql.apollo.exception.ApolloException;
 
 import net.openid.appauth.AuthState;
 import net.openid.appauth.AuthorizationException;
@@ -28,17 +31,23 @@ import net.openid.appauth.ClientAuthentication;
 import net.openid.appauth.ResponseTypeValues;
 import net.openid.appauth.TokenResponse;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
 
-public class WarhornActivity extends AppCompatActivity {
+
+public class WarhornActivity extends AppCompatActivity implements EventInfoFragment.GraphQLListener {
     public static final String TAG = "Warhorn Activity";
     AuthState authState;
     AuthorizationService authService;
+    ApolloClient apolloClient;
 
     Fragment EventInfo;
     Fragment UserInfo;
@@ -47,24 +56,36 @@ public class WarhornActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_warhorn);
+
+        EventInfo = getSupportFragmentManager().findFragmentById(R.id.Event_Info);
+        if(!(EventInfo instanceof EventInfoFragment)){
+            EventInfo = new EventInfoFragment();
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.Event_Info ,EventInfo)
+                    .commit();
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        EventInfo = getSupportFragmentManager().findFragmentById(R.id.Event_Info);
-        UserInfo = getSupportFragmentManager().findFragmentById(R.id.Profile_Info);
-
-        if(!(UserInfo instanceof UserInfoFragment)){
-            handleIntent(getIntent());
+        try {
+            authState = AuthManager.readAuthState(this);
+        } catch (JSONException e) {
+            Log.d(TAG, "Auth State formatted incorrectly");
         }
-        if(!(EventInfo instanceof EventInfoFragment)) {
-            EventInfo = EventInfoFragment.NewInstance(authState.getAccessToken());
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .add(R.id.Event_Info, EventInfo)
-                    .commit();
+
+        if(authState == null){
+            handleIntent(getIntent());
+        }else{
+            Log.d(TAG, "Using predefined authorization");
+            authService = new AuthorizationService(this);
+            initializeApolloClient();
+            if(!(UserInfo instanceof UserInfoFragment)){
+                getUserInfo();
+            }
         }
     }
 
@@ -74,6 +95,50 @@ public class WarhornActivity extends AppCompatActivity {
         AuthManager.writeAuthState(this, authState);
         authState = null;
         authService.dispose();
+    }
+
+    //Extracts Authorization response from intent and sends to getUserToken()
+    public void handleIntent(Intent intent){
+        if(intent.getAction().equals((Intent.ACTION_VIEW))){
+            authState = new AuthState();
+            authService = new AuthorizationService(this);
+            Log.d(TAG, intent.getData().toString());
+            AuthorizationResponse.Builder builder = new AuthorizationResponse.Builder(AuthManager.generateRequest(this));
+            AuthorizationResponse response = builder.fromUri(intent.getData()).build();
+            if(response == null){
+                AuthorizationException exception = AuthorizationException.fromOAuthRedirect(intent.getData());
+                if(exception == null)
+                    Log.d(TAG, "Response from server is null");
+                else
+                    Log.e(TAG, "Registration failed with following error: " + exception.toString());
+            }else{
+                authState.update(response, null);
+                getUserToken(response);
+            }
+        }
+    }
+
+    //Grabs user token and stores it in authState from successful authorization response
+    //Then calls getUserInfo() to use acquired token to obtain relevant user information
+    public void getUserToken(AuthorizationResponse response){
+        authService.performTokenRequest(
+                response.createTokenExchangeRequest(),
+                new AuthorizationService.TokenResponseCallback() {
+                    @Override public void onTokenRequestCompleted(TokenResponse token, AuthorizationException ex) {
+                        if (token != null) {
+                            // token obtained
+                            //Log.d(TAG, token.jsonSerializeString());
+                            authState.update(token, ex);
+                            Log.d(TAG, "Obtained following access token: " + authState.getAccessToken());
+                            Log.d(TAG, "Obtained id token: " + authState.getIdToken());
+                            initializeApolloClient(); //Create apollo client now that we can authenticate
+                            getUserInfo(); //Grab User Info now that we can authenticate
+                        } else {
+                            // authorization failed
+                            Log.e(TAG, "Token exchanged failed with following error: " + ex.toString());
+                        }
+                    }
+                });
     }
 
     //Using obtained access token requests user info from warhorn and updates UI with response
@@ -117,6 +182,7 @@ public class WarhornActivity extends AppCompatActivity {
     //Then creates new user info fragment with relevant information
     private void updateUI(JSONObject userInfo){
         try {
+            //Creates User Info Fragment
             String name = userInfo.getString("name");
             String email = userInfo.getString("email");
             String pictureURL = userInfo.getString("picture");
@@ -130,56 +196,58 @@ public class WarhornActivity extends AppCompatActivity {
         }
     }
 
-    //Extracts Authorization response from intent and sends to getUserToken()
-    public void handleIntent(Intent intent){
-        if(intent.getAction().equals((Intent.ACTION_VIEW))){
-            authState = new AuthState();
-            authService = new AuthorizationService(this);
-            Log.d(TAG, intent.getData().toString());
-            AuthorizationResponse.Builder builder = new AuthorizationResponse.Builder(AuthManager.generateRequest(this));
-            AuthorizationResponse response = builder.fromUri(intent.getData()).build();
-            if(response == null){
-                AuthorizationException exception = AuthorizationException.fromOAuthRedirect(intent.getData());
-                if(exception == null)
-                    Log.d(TAG, "Response from server is null");
-                else
-                    Log.e(TAG, "Registration failed with following error: " + exception.toString());
-            }else{
-                authState.update(response, null);
-                getUserToken(response);
-            }
-        }else{
-            Log.d(TAG, "Getting pre-existing authorization");
-            try {
-                authState = AuthManager.readAuthState(this);
-            } catch (JSONException e) {
-                Log.e(TAG, "Authstate not properly formatted");
-                authState = new AuthState();
-            }
-            authService = new AuthorizationService(this);
-            getUserInfo();
-        }
+    //Creates ApolloClient for graphql queries and mutations
+    private void initializeApolloClient(){
+        Log.d(TAG, "Making apollo client");
+        //Adds authorization interceptor to apollo client
+        OkHttpClient.Builder authBuilder = new OkHttpClient.Builder();
+        OkHttpClient authClient = authBuilder
+                .addInterceptor(new AuthorizationInterceptor(authState.getAccessToken()))
+                .build();
+
+        //Initalizes the apollo client with warhorn's graphql endpoint
+        apolloClient = ApolloClient.builder()
+                .serverUrl(getString(R.string.graphql_end_point))
+                .okHttpClient(authClient)
+                .build();
+        Log.d(TAG, "Made apollo client");
     }
 
-    //Grabs user token and stores it in authState from successful authorization response
-    //Then calls getUserInfo() to use acquired token to obtain relevant user information
-    public void getUserToken(AuthorizationResponse response){
-        authService.performTokenRequest(
-                response.createTokenExchangeRequest(),
-                new AuthorizationService.TokenResponseCallback() {
-                    @Override public void onTokenRequestCompleted(TokenResponse token, AuthorizationException ex) {
-                        if (token != null) {
-                            // token obtained
-                            //Log.d(TAG, token.jsonSerializeString());
-                            authState.update(token, ex);
-                            Log.d(TAG, "Obtained following access token: " + authState.getAccessToken());
-                            Log.d(TAG, "Obtained id token: " + authState.getIdToken());
-                            getUserInfo();
-                        } else {
-                            // authorization failed
-                            Log.e(TAG, "Token exchanged failed with following error: " + ex.toString());
-                        }
+    @Override
+    public void query(String slug){
+        if(apolloClient == null){
+            Log.d(TAG, "Unable to query at this time");
+            return;
+        }
+        apolloClient.query(new EventTitleQuery(slug))
+                .enqueue(new ApolloCall.Callback<EventTitleQuery.Data>() {
+                    @Override
+                    public void onResponse(@NotNull com.apollographql.apollo.api.Response<EventTitleQuery.Data> response) {
+                        Log.d("Apollo", response.getData().toString());
+                    }
+
+                    @Override
+                    public void onFailure(@NotNull ApolloException e) {
+                        Log.e("Apollo", "Error", e);
                     }
                 });
+    }
+
+    //Class used to add authorization to each graphql query/mutation
+    private class AuthorizationInterceptor implements Interceptor {
+        private String accessToken;
+
+        public AuthorizationInterceptor(String accessToken){
+            this.accessToken = accessToken;
+        }
+        @Override
+        public okhttp3.Response intercept(Chain chain) throws IOException {
+            //Adds authentication to our queries/mutations
+            okhttp3.Request request = chain.request().newBuilder()
+                    .addHeader("Authorization", "bearer " + accessToken)
+                    .build();
+
+            return chain.proceed(request);
+        }
     }
 }

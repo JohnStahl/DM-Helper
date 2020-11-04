@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity{
             Intent intent = new Intent(this, WarhornActivity.class);
             PendingIntent pi = PendingIntent.getActivity(this, 0, intent, FLAG_UPDATE_CURRENT);
             service.performAuthorizationRequest(AuthManager.generateRequest(this), pi);
+            service.dispose();
         }else{
             Intent intent = new Intent(this, WarhornActivity.class);
             intent.setAction(getString(R.string.already_authenticated));
