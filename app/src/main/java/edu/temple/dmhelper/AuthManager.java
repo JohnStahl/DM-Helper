@@ -2,8 +2,12 @@ package edu.temple.dmhelper;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
 
 import net.openid.appauth.AuthState;
+import net.openid.appauth.AuthorizationRequest;
+import net.openid.appauth.AuthorizationServiceConfiguration;
+import net.openid.appauth.ResponseTypeValues;
 
 import org.json.JSONException;
 
@@ -26,5 +30,22 @@ public class AuthManager {
         authPrefs.edit()
                 .putString("stateJson", authState.jsonSerializeString())
                 .apply();
+    }
+
+    //Creates request to warhorn for authorization
+    public static AuthorizationRequest generateRequest(Context context){
+        //Sets up authorization configuration
+        Uri auth_end_point = Uri.parse(context.getString(R.string.auth_end_point));
+        Uri token_end_point = Uri.parse(context.getString(R.string.token_end_point));
+        AuthorizationServiceConfiguration config =
+                new AuthorizationServiceConfiguration(auth_end_point, token_end_point);
+
+        AuthorizationRequest request = new AuthorizationRequest.Builder(
+                config,
+                context.getString(R.string.client_id),
+                ResponseTypeValues.CODE,
+                Uri.parse(context.getString(R.string.redirect_url))
+        ).build();
+        return request;
     }
 }

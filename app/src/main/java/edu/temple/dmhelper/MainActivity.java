@@ -44,23 +44,6 @@ public class MainActivity extends AppCompatActivity{
         });
     }
 
-    //Creates request to warhorn for authorization
-    public AuthorizationRequest generateRequest(){
-        //Sets up authorization configuration
-        Uri auth_end_point = Uri.parse(getString(R.string.auth_end_point));
-        Uri token_end_point = Uri.parse(getString(R.string.token_end_point));
-        AuthorizationServiceConfiguration config =
-                new AuthorizationServiceConfiguration(auth_end_point, token_end_point);
-
-        AuthorizationRequest request = new AuthorizationRequest.Builder(
-                config,
-                getString(R.string.client_id),
-                ResponseTypeValues.CODE,
-                Uri.parse(getString(R.string.redirect_url))
-        ).setScopes("openid", "profile", "email").build();
-        return request;
-    }
-
     //Called by warhorn fragment to initialize login by user into their warhorn fragment
     public void authorize() throws JSONException {
         //Uses service to submit request
@@ -69,7 +52,7 @@ public class MainActivity extends AppCompatActivity{
             AuthorizationService service = new AuthorizationService(this);
             Intent intent = new Intent(this, WarhornActivity.class);
             PendingIntent pi = PendingIntent.getActivity(this, 0, intent, FLAG_UPDATE_CURRENT);
-            service.performAuthorizationRequest(generateRequest(), pi);
+            service.performAuthorizationRequest(AuthManager.generateRequest(this), pi);
         }else{
             Intent intent = new Intent(this, WarhornActivity.class);
             intent.setAction(getString(R.string.already_authenticated));

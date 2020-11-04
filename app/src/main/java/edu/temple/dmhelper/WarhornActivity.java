@@ -2,6 +2,7 @@ package edu.temple.dmhelper;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -39,6 +40,9 @@ public class WarhornActivity extends AppCompatActivity {
     AuthState authState;
     AuthorizationService authService;
 
+    Fragment EventInfo;
+    Fragment UserInfo;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,12 +52,20 @@ public class WarhornActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        handleIntent(getIntent());
 
-        getSupportFragmentManager()
-                .beginTransaction()
-                .add(R.id.Event_Info, EventInfoFragment.NewInstance(authState.getAccessToken()))
-                .commit();
+        EventInfo = getSupportFragmentManager().findFragmentById(R.id.Event_Info);
+        UserInfo = getSupportFragmentManager().findFragmentById(R.id.Profile_Info);
+
+        if(!(UserInfo instanceof UserInfoFragment)){
+            handleIntent(getIntent());
+        }
+        if(!(EventInfo instanceof EventInfoFragment)) {
+            EventInfo = EventInfoFragment.NewInstance(authState.getAccessToken());
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.Event_Info, EventInfo)
+                    .commit();
+        }
     }
 
     @Override
@@ -108,10 +120,10 @@ public class WarhornActivity extends AppCompatActivity {
             String name = userInfo.getString("name");
             String email = userInfo.getString("email");
             String pictureURL = userInfo.getString("picture");
-            UserInfoFragment fragment = UserInfoFragment.newInstance(name, email, pictureURL);
+            UserInfo = UserInfoFragment.newInstance(name, email, pictureURL);
             getSupportFragmentManager()
                     .beginTransaction()
-                    .add(R.id.Profile_Info, fragment)
+                    .add(R.id.Profile_Info, UserInfo)
                     .commit();
         } catch (JSONException e) {
             Log.e(TAG, "Obtained user info object is invalid");
@@ -124,7 +136,7 @@ public class WarhornActivity extends AppCompatActivity {
             authState = new AuthState();
             authService = new AuthorizationService(this);
             Log.d(TAG, intent.getData().toString());
-            AuthorizationResponse.Builder builder = new AuthorizationResponse.Builder(generateRequest());
+            AuthorizationResponse.Builder builder = new AuthorizationResponse.Builder(AuthManager.generateRequest(this));
             AuthorizationResponse response = builder.fromUri(intent.getData()).build();
             if(response == null){
                 AuthorizationException exception = AuthorizationException.fromOAuthRedirect(intent.getData());
@@ -169,22 +181,5 @@ public class WarhornActivity extends AppCompatActivity {
                         }
                     }
                 });
-    }
-
-    //Creates request to warhorn for authorization
-    public AuthorizationRequest generateRequest(){
-        //Sets up authorization configuration
-        Uri auth_end_point = Uri.parse(getString(R.string.auth_end_point));
-        Uri token_end_point = Uri.parse(getString(R.string.token_end_point));
-        AuthorizationServiceConfiguration config =
-                new AuthorizationServiceConfiguration(auth_end_point, token_end_point);
-
-        AuthorizationRequest request = new AuthorizationRequest.Builder(
-                config,
-                getString(R.string.client_id),
-                ResponseTypeValues.CODE,
-                Uri.parse(getString(R.string.redirect_url))
-        ).build();
-        return request;
     }
 }
