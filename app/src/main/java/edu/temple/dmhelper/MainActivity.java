@@ -23,9 +23,17 @@ import net.openid.appauth.TokenResponse;
 import org.json.JSONException;
 
 import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
+import android.bluetooth.BluetoothDevice;
+import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
 
-public class MainActivity extends AppCompatActivity{
-    private static final String TAG = "Main Activity";
+import edu.temple.dmhelper.bluetooth.DiscoveryActivity;
+
+public class MainActivity extends AppCompatActivity {
+    public static final String TAG = "MainActivity";
+
+    public static final int REQUEST_DISCOVER_DEVICE = 1001;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +66,30 @@ public class MainActivity extends AppCompatActivity{
             Intent intent = new Intent(this, WarhornActivity.class);
             intent.setAction(getString(R.string.already_authenticated));
             startActivity(intent);
+        }
+    }
+
+    private void startDiscoveryActivity() {
+        Log.d(TAG, "Launching Discovery Activity");
+        Intent intent = new Intent(this, DiscoveryActivity.class);
+        startActivityForResult(intent, REQUEST_DISCOVER_DEVICE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_DISCOVER_DEVICE) {
+            if (resultCode == RESULT_OK && data != null) {
+                BluetoothDevice device = (BluetoothDevice) data.getParcelableExtra(DiscoveryActivity.EXTRA_DEVICE);
+                if (device != null) {
+                    Log.d(TAG, "Device selected: " + device.toString());
+                    // TODO: Handle selected device
+                }
+            } else {
+                Log.d(TAG, "Discovery cancelled");
+                // TODO: Handle discovery cancelled
+            }
         }
     }
 }

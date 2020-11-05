@@ -4,6 +4,9 @@
     package="edu.temple.dmhelper">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -12,6 +15,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity android:name=".WarhornActivity">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -24,6 +28,13 @@
                     android:host="dm-helper.netlify.app" />
             </intent-filter>
         </activity>
+        <activity android:name=".bluetooth.DiscoveryActivity" />
+
+        <service
+            android:name=".bluetooth.BluetoothService"
+            android:enabled="true"
+            android:exported="false" />
+
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
