@@ -65,7 +65,7 @@ public class BluetoothConnection {
     }
 
     public static BluetoothConnection connect(BluetoothDevice device, Handler handler) throws IOException {
-        BluetoothSocket socket = device.createRfcommSocketToServiceRecord(BluetoothService.SELF_ID);
+        BluetoothSocket socket = device.createRfcommSocketToServiceRecord(BluetoothService.SERVICE_ID);
         socket.connect();
         return new BluetoothConnection(socket, device, handler);
     }
