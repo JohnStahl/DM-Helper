@@ -104,6 +104,7 @@ public class DiscoveryActivity extends AppCompatActivity {
 
         checkBluetoothEnabled();
         checkLocationPermission();
+        startDiscovery();
     }
 
     @Override

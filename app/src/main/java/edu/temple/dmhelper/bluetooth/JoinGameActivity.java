@@ -24,7 +24,6 @@ public class JoinGameActivity extends AppCompatActivity {
     public static final String EXTRA_DEVICE = "edu.temple.dmhelper.join.extra.DEVICE";
     public static final String EXTRA_CHARACTER = "edu.temple.dmhelper.join.extra.CHARACTER";
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
