@@ -1,8 +1,11 @@
 package edu.temple.dmhelper;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.UUID;
 
-public class Character {
+public class Character implements Parcelable {
     private int initiative;
     private String name;
     private UUID id;
@@ -70,5 +73,34 @@ public class Character {
      */
     public void setId(UUID id) {
         this.id = id;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id.toString());
+        dest.writeString(name);
+        dest.writeInt(initiative);
+    }
+
+    public static final Parcelable.Creator<Character> CREATOR
+            = new Parcelable.Creator<Character>() {
+        public Character createFromParcel(Parcel in) {
+            return new Character(in);
+        }
+
+        public Character[] newArray(int size) {
+            return new Character[size];
+        }
+    };
+
+    private Character(Parcel in) {
+        id = UUID.fromString(in.readString());
+        name = in.readString();
+        initiative = in.readInt();
     }
 }
