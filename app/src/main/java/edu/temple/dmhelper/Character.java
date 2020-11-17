@@ -3,6 +3,8 @@ package edu.temple.dmhelper;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
+
 import java.util.UUID;
 
 public class Character implements Parcelable {
@@ -78,6 +80,16 @@ public class Character implements Parcelable {
     @Override
     public int describeContents() {
         return 0;
+    }
+
+    @Override
+    @NonNull
+    public String toString() {
+        return "Character{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", initiative=" + initiative +
+                '}';
     }
 
     @Override

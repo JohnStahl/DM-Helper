@@ -16,4 +16,9 @@
         We are required to ask for location permissions to discover nearby devices. Without this
         permission we are unable to find the DM\'s device to establish a connection.
     </string>
+
+    <string name="character_name">Character Name</string>
+    <string name="character_initiative">Character Initiative</string>
+    <string name="join_game">Join</string>
+    <string name="join_game_title">Joining game</string>
 </resources>
