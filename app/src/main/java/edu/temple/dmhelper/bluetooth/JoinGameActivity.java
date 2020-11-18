@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 import edu.temple.dmhelper.Character;
@@ -40,12 +41,12 @@ public class JoinGameActivity extends AppCompatActivity {
             return;
         }
 
-        ArrayAdapter<Integer> initiativeAdapter = new ArrayAdapter<>(
+        ArrayAdapter<CharSequence> initiativeAdapter = ArrayAdapter.createFromResource(
                 this,
-                R.layout.support_simple_spinner_dropdown_item,
-                android.R.id.text1,
-                new Integer[]{1, 2, 3}
+                R.array.initiatives,
+                android.R.layout.simple_spinner_item
         );
+        initiativeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         initiativeSpin.setAdapter(initiativeAdapter);
 
         ((TextView) findViewById(R.id.device)).setText(device.getName());
@@ -55,7 +56,7 @@ public class JoinGameActivity extends AppCompatActivity {
             public void onClick(View v) {
                 UUID id = UUID.randomUUID();
                 String name = nameField.getText().toString();
-                int initiative = (Integer) initiativeSpin.getSelectedItem();
+                int initiative = initiativeSpin.getSelectedItemPosition();
                 Character character = new Character(name, initiative, id);
 
                 Intent intent = new Intent(ACTION_CHARACTER_CREATED);

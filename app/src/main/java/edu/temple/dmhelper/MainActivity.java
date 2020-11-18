@@ -16,7 +16,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
-import android.view.View;
 
 import net.openid.appauth.AuthState;
 import net.openid.appauth.AuthorizationService;
@@ -34,8 +33,12 @@ import edu.temple.dmhelper.bluetooth.BluetoothService;
 import edu.temple.dmhelper.bluetooth.DiscoveryActivity;
 import edu.temple.dmhelper.bluetooth.JoinGameActivity;
 import edu.temple.dmhelper.bluetooth.message.BluetoothMessage;
+import edu.temple.dmhelper.bluetooth.message.GameEndMessage;
 import edu.temple.dmhelper.bluetooth.message.GameStartMessage;
+import edu.temple.dmhelper.bluetooth.message.NextRoundMessage;
 import edu.temple.dmhelper.bluetooth.message.PlayerJoinMessage;
+import edu.temple.dmhelper.bluetooth.message.PlayerLeftMessage;
+import edu.temple.dmhelper.bluetooth.message.PlayerListMessage;
 
 public class MainActivity extends AppCompatActivity implements ActionInterface {
     public static final String TAG = "MainActivity";
@@ -61,9 +64,42 @@ public class MainActivity extends AppCompatActivity implements ActionInterface {
     };
     private final Handler messageHandler = new Handler(new Handler.Callback() {
         @Override
-        public boolean handleMessage(@NonNull Message msg) {
-            BluetoothMessage message = (BluetoothMessage) msg.obj;
-
+        public boolean handleMessage(@NonNull Message androidMsg) {
+            BluetoothMessage msg = (BluetoothMessage) androidMsg.obj;
+            if (((DmhelperApplication) getApplication()).isDm()) { // Message from client to server
+                switch (msg.getType()) {
+                    case PlayerJoinMessage.TYPE:
+                        lobbyFragment.addCharacter(((PlayerJoinMessage) msg).getPlayer());
+                        msg.getFrom().sendMessage(new PlayerListMessage(lobbyFragment.getCharacters()));
+                        btBinder.sendMessage(msg);
+                        break;
+                    case PlayerLeftMessage.TYPE:
+                        lobbyFragment.removeCharacter(((PlayerLeftMessage) msg).getPlayer());
+                        btBinder.sendMessage(msg);
+                        break;
+                }
+            } else { // Message from server to client
+                switch (msg.getType()) {
+                    case PlayerJoinMessage.TYPE:
+                        lobbyFragment.addCharacter(((PlayerJoinMessage) msg).getPlayer());
+                        break;
+                    case PlayerLeftMessage.TYPE:
+                        lobbyFragment.removeCharacter(((PlayerLeftMessage) msg).getPlayer());
+                        break;
+                    case PlayerListMessage.TYPE:
+                        lobbyFragment.addCharacters(((PlayerListMessage) msg).getPlayers());
+                        break;
+                    case GameStartMessage.TYPE:
+                        // TODO: Show Initiative Tracker
+                        break;
+                    case GameEndMessage.TYPE:
+                        showMainMenu();
+                        break;
+                    case NextRoundMessage.TYPE:
+                        // TODO: Handle next round
+                        break;
+                }
+            }
             return true;
         }
     });
@@ -148,6 +184,7 @@ public class MainActivity extends AppCompatActivity implements ActionInterface {
         if (!btServiceBound) return false;
 
         try {
+            ((DmhelperApplication) getApplication()).setDm(false);
             btBinder.connectToServer(device, messageHandler);
             btBinder.sendMessage(new PlayerJoinMessage(character));
         } catch (IOException e) {
@@ -176,6 +213,7 @@ public class MainActivity extends AppCompatActivity implements ActionInterface {
     public void createGame() {
         if (btServiceBound) {
             try {
+                ((DmhelperApplication) getApplication()).setDm(true);
                 btBinder.startServer(messageHandler);
                 showLobby();
             } catch (IOException e) {

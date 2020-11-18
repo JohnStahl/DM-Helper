@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -18,7 +19,7 @@ import java.util.List;
  * create an instance of this fragment.
  */
 public class LobbyFragment extends Fragment {
-    private List<Character> characters;
+    private final ArrayList<Character> characters;
 
     public LobbyFragment() {
         this.characters = new ArrayList<>();
@@ -43,14 +44,25 @@ public class LobbyFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_lobby, container, false);
+        View root = inflater.inflate(R.layout.fragment_lobby, container, false);
+
+        return root;
     }
 
     public void addCharacter(Character character) {
-        this.characters.add(character);
+        if (!characters.contains(character))
+            this.characters.add(character);
     }
 
     public void removeCharacter(Character character) {
         this.characters.remove(character);
+    }
+
+    public void addCharacters(ArrayList<Character> characters) {
+        for (Character character : characters) addCharacter(character);
+    }
+
+    public ArrayList<Character> getCharacters() {
+        return this.characters;
     }
 }

@@ -26,7 +26,9 @@ public class BluetoothConnection {
             while (!Thread.interrupted()) {
                 try {
                     Message message = Message.obtain();
-                    message.obj = in.readObject();
+                    BluetoothMessage btMsg = (BluetoothMessage) in.readObject();
+                    btMsg.setConnection(BluetoothConnection.this);
+                    message.obj = btMsg;
                     handler.sendMessage(message);
                 } catch (ClassNotFoundException | IOException e) {
                     e.printStackTrace();
@@ -46,7 +48,7 @@ public class BluetoothConnection {
         readThread.start();
     }
 
-    void sendMessage(BluetoothMessage message) {
+    public void sendMessage(BluetoothMessage message) {
         try {
             out.writeObject(message);
         } catch (IOException e) {

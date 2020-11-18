@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="initiatives">
+        <item>Initiative 1</item>
+        <item>Initiative 2</item>
+        <item>Initiative 3</item>
+    </string-array>
+</resources>

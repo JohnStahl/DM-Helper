@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import edu.temple.dmhelper.Character;
 
 public class PlayerListMessage extends BluetoothMessage {
-    public static final String TYPE = "player_left";
+    public static final String TYPE = "player_list";
 
     private final ArrayList<Character> players;
 
