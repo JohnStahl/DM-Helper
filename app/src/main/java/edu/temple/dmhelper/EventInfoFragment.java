@@ -12,22 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.apollographql.apollo.ApolloCall;
-import com.apollographql.apollo.ApolloClient;
-import com.apollographql.apollo.api.Response;
-import com.apollographql.apollo.exception.ApolloException;
-
-import net.openid.appauth.AuthState;
-
-import org.jetbrains.annotations.NotNull;
-import org.json.JSONException;
-
-import java.io.IOException;
-
-import okhttp3.Interceptor;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-
 public class EventInfoFragment extends Fragment {
     private static final String TAG = "Event Fragment";
     GraphQLListener mListener;
@@ -58,16 +42,17 @@ public class EventInfoFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_event_info, container, false);
-        view.findViewById(R.id.test_button).setOnClickListener(new View.OnClickListener() {
+        view.findViewById(R.id.AddButton).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                mListener.query("indy-dnd");
+            public void onClick(View view) {
+                mListener.startEventDialogue();
             }
         });
         return view;
     }
 
     public interface GraphQLListener{
+        void startEventDialogue();
         void query(String slug);
     }
 }

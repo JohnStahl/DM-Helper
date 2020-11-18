@@ -12,6 +12,11 @@
     <string name="access_token">VT9oeVDJxbAAi4xfCN9bH8BD</string>
     <string name="warhorn_auth_action">auth</string>
     <string name="already_authenticated">true</string>
+    <string name="hello_blank_fragment">Blank</string>
+    <string name="AddButtonText">+ Add</string>
+    <string name="EventDialogue">Please enter the event slug you wish to add</string>
+    <string name="AddEvent">Add</string>
+    <string name="CancelEvent">Cancel</string>
 
     <string name="refresh">Refresh</string>
 

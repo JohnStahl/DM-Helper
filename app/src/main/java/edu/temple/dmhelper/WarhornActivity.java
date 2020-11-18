@@ -2,6 +2,7 @@ package edu.temple.dmhelper;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
 import android.content.Intent;
@@ -43,7 +44,7 @@ import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 
 
-public class WarhornActivity extends AppCompatActivity implements EventInfoFragment.GraphQLListener {
+public class WarhornActivity extends AppCompatActivity implements EventInfoFragment.GraphQLListener, AddEventDialogue.EventAdder {
     public static final String TAG = "Warhorn Activity";
     AuthState authState;
     AuthorizationService authService;
@@ -214,6 +215,12 @@ public class WarhornActivity extends AppCompatActivity implements EventInfoFragm
     }
 
     @Override
+    public void startEventDialogue() {
+        DialogFragment eventDialogue = new AddEventDialogue();
+        eventDialogue.show(getSupportFragmentManager(), "add event");
+    }
+
+    @Override
     public void query(String slug){
         if(apolloClient == null){
             Log.d(TAG, "Unable to query at this time");
@@ -231,6 +238,11 @@ public class WarhornActivity extends AppCompatActivity implements EventInfoFragm
                         Log.e("Apollo", "Error", e);
                     }
                 });
+    }
+
+    @Override
+    public void addEvent(String slug) {
+        Log.d(TAG, slug);
     }
 
     //Class used to add authorization to each graphql query/mutation
