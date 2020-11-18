@@ -25,30 +25,30 @@ public class BluetoothService extends Service {
     public BluetoothService() {
     }
 
-    class BluetoothServiceBinder extends Binder {
-        void startServer(Handler handler) throws IOException {
+    public class BluetoothBinder extends Binder {
+        public void startServer(Handler handler) throws IOException {
             BluetoothService.this.handler = handler;
             BluetoothService.this.startServer();
         }
 
-        void stopAcceptingClients() {
+        public void stopAcceptingClients() {
             BluetoothService.this.stopAcceptingClients();
         }
 
-        void stopServer() throws IOException {
+        public void stopServer() throws IOException {
             BluetoothService.this.stopServer();
         }
 
-        void sendMessage(BluetoothMessage message) {
+        public void sendMessage(BluetoothMessage message) {
             BluetoothService.this.sendMessage(message);
         }
 
-        void connectToServer(BluetoothDevice device, Handler handler) throws IOException {
+        public void connectToServer(BluetoothDevice device, Handler handler) throws IOException {
             BluetoothService.this.handler = handler;
             BluetoothService.this.connectToServer(device);
         }
 
-        void disconnect() {
+        public void disconnect() {
             BluetoothService.this.disconnect();
         }
     }
@@ -92,7 +92,7 @@ public class BluetoothService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        return new BluetoothServiceBinder();
+        return new BluetoothBinder();
     }
 
     @Override
