@@ -7,6 +7,12 @@ public class Character {
     private String name;
     private UUID id;
 
+
+    public Character(String name, int initiative){
+        this.name = name;
+        this.initiative = initiative;
+        this.id = UUID.randomUUID();
+    }
     public Character(String name, int initiative, UUID id){
         this.name = name;
         this.initiative = initiative;
@@ -70,5 +76,10 @@ public class Character {
      */
     public void setId(UUID id) {
         this.id = id;
+    }
+
+
+    public String toString() {
+        return "" + this.initiative + " " + this.name;
     }
 }
