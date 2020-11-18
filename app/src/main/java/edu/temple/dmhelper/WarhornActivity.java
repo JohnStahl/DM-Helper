@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Parcelable;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
@@ -47,7 +48,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import okhttp3.Interceptor;
@@ -64,6 +68,15 @@ public class WarhornActivity extends AppCompatActivity implements EventInfoFragm
             }
             ((EventInfoFragment)EventInfo).updateEventSpinner(contents[0]);
             //Log.d(TAG, myEvents.toString());
+            return false;
+        }
+    });
+
+    Handler DisplaySessionsHandler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(@NonNull Message message) {
+            List<SessionsQuery.Node> sessions = (List<SessionsQuery.Node>)message.getData().get("Sessions");
+            ((EventInfoFragment)EventInfo).displaySessions(sessions);
             return false;
         }
     });
@@ -117,7 +130,7 @@ public class WarhornActivity extends AppCompatActivity implements EventInfoFragm
         if(authState == null){
             handleIntent(getIntent());
         }else{
-            Log.d(TAG, "Using predefined authorization");
+            //Log.d(TAG, "Using predefined authorization");
             authService = new AuthorizationService(this);
             initializeApolloClient();
             if(!(UserInfo instanceof UserInfoFragment)){
@@ -172,7 +185,7 @@ public class WarhornActivity extends AppCompatActivity implements EventInfoFragm
         if(intent.getAction().equals((Intent.ACTION_VIEW))){
             authState = new AuthState();
             authService = new AuthorizationService(this);
-            Log.d(TAG, intent.getData().toString());
+            //Log.d(TAG, intent.getData().toString());
             AuthorizationResponse.Builder builder = new AuthorizationResponse.Builder(AuthManager.generateRequest(this));
             AuthorizationResponse response = builder.fromUri(intent.getData()).build();
             if(response == null){
@@ -199,8 +212,8 @@ public class WarhornActivity extends AppCompatActivity implements EventInfoFragm
                             // token obtained
                             //Log.d(TAG, token.jsonSerializeString());
                             authState.update(token, ex);
-                            Log.d(TAG, "Obtained following access token: " + authState.getAccessToken());
-                            Log.d(TAG, "Obtained id token: " + authState.getIdToken());
+                            //Log.d(TAG, "Obtained following access token: " + authState.getAccessToken());
+                            //Log.d(TAG, "Obtained id token: " + authState.getIdToken());
                             initializeApolloClient(); //Create apollo client now that we can authenticate
                             getUserInfo(); //Grab User Info now that we can authenticate
                         } else {
@@ -223,7 +236,7 @@ public class WarhornActivity extends AppCompatActivity implements EventInfoFragm
                     @Override
                     public void onResponse(JSONObject response) {
                         //Successful request and we should update UI with newly obtained user info
-                        Log.d(TAG, "Got response from warhorn");
+                        //Log.d(TAG, "Got response from warhorn");
                         updateUI(response);
                     }
                 }, new Response.ErrorListener() {
@@ -238,7 +251,7 @@ public class WarhornActivity extends AppCompatActivity implements EventInfoFragm
                         //Adds access token to request
                         Map<String, String> headers = new HashMap<>();
                         headers.put("Authorization", "bearer " + accessToken);
-                        Log.d(TAG, headers.toString());
+                        //Log.d(TAG, headers.toString());
                         return headers;
                     }
                 };
@@ -268,7 +281,7 @@ public class WarhornActivity extends AppCompatActivity implements EventInfoFragm
 
     //Creates ApolloClient for graphql queries and mutations
     private void initializeApolloClient(){
-        Log.d(TAG, "Making apollo client");
+        //Log.d(TAG, "Making apollo client");
         //Adds authorization interceptor to apollo client
         OkHttpClient.Builder authBuilder = new OkHttpClient.Builder();
         OkHttpClient authClient = authBuilder
@@ -280,7 +293,7 @@ public class WarhornActivity extends AppCompatActivity implements EventInfoFragm
                 .serverUrl(getString(R.string.graphql_end_point))
                 .okHttpClient(authClient)
                 .build();
-        Log.d(TAG, "Made apollo client");
+        //Log.d(TAG, "Made apollo client");
     }
 
     @Override
@@ -290,16 +303,24 @@ public class WarhornActivity extends AppCompatActivity implements EventInfoFragm
     }
 
     @Override
-    public void query(String slug){
+    public void querySessions(String eventName){
         if(apolloClient == null){
-            Log.d(TAG, "Unable to query at this time");
+            Log.d("Apollo", "Unable to query at this time");
             return;
         }
-        apolloClient.query(new EventTitleQuery(slug))
-                .enqueue(new ApolloCall.Callback<EventTitleQuery.Data>() {
+        String slug = myEvents.get(eventName);
+        Log.d("Apollo", "Attempting to query with this slug: " + slug);
+        apolloClient.query(new SessionsQuery(slug))
+                .enqueue(new ApolloCall.Callback<SessionsQuery.Data>() {
                     @Override
-                    public void onResponse(@NotNull com.apollographql.apollo.api.Response<EventTitleQuery.Data> response) {
-                        Log.d("Apollo", response.getData().toString());
+                    public void onResponse(@NotNull com.apollographql.apollo.api.Response<SessionsQuery.Data> response) {
+                        //Log.d("Apollo", response.getData().sessions.nodes.toArray()[0].toString());
+                        List<SessionsQuery.Node> sessions = response.getData().sessions.nodes;
+                        Message msg = Message.obtain();
+                        Bundle data = new Bundle();
+                        data.putSerializable("Sessions", (Serializable) sessions);
+                        msg.setData(data);
+                        DisplaySessionsHandler.sendMessage(msg);
                     }
 
                     @Override
@@ -318,7 +339,7 @@ public class WarhornActivity extends AppCompatActivity implements EventInfoFragm
                 .enqueue(new ApolloCall.Callback<EventTitleQuery.Data>() {
                     @Override
                     public void onResponse(@NotNull com.apollographql.apollo.api.Response<EventTitleQuery.Data> response) {
-                        Log.d("Apollo", response.getData().toString());
+                        //Log.d("Apollo", response.getData().toString());
                         Message msg = Message.obtain();
                         String messageContents[] = {response.getData().event.title, slug};
                         msg.obj = messageContents;
