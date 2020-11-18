@@ -17,6 +17,7 @@
     <string name="EventDialogue">Please enter the event slug you wish to add</string>
     <string name="AddEvent">Add</string>
     <string name="CancelEvent">Cancel</string>
+    <string name="EventsFile">Events</string>
 
     <string name="refresh">Refresh</string>
 

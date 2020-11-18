@@ -1,5 +1,6 @@
 package edu.temple.dmhelper;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
@@ -7,8 +8,11 @@ import androidx.fragment.app.Fragment;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
@@ -36,7 +40,13 @@ import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,6 +55,20 @@ import okhttp3.OkHttpClient;
 
 
 public class WarhornActivity extends AppCompatActivity implements EventInfoFragment.GraphQLListener, AddEventDialogue.EventAdder {
+    Handler EventTitleHandler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(@NonNull Message msg) {
+            String contents[] = (String[]) msg.obj;
+            if(!myEvents.containsKey(contents[0])) {
+                myEvents.put(contents[0], contents[1]);
+            }
+            //Log.d(TAG, myEvents.toString());
+            return false;
+        }
+    });
+
+    Map<String, String> myEvents;
+
     public static final String TAG = "Warhorn Activity";
     AuthState authState;
     AuthorizationService authService;
@@ -88,6 +112,37 @@ public class WarhornActivity extends AppCompatActivity implements EventInfoFragm
                 getUserInfo();
             }
         }
+        getMyEvents();
+    }
+
+    public void getMyEvents() {
+        File file = new File(getFilesDir(), getString(R.string.EventsFile));
+        if(file.exists() && file.length() > 0){
+            try {
+                String path = file.getPath();
+                ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(path));
+                myEvents = (Map<String, String>) inputStream.readObject();
+                inputStream.close();
+            } catch (IOException e){
+                file.delete();
+            } catch (ClassNotFoundException e){
+                Log.e(TAG, "Unknown class in Events file");
+            }
+        }else{
+            myEvents = new HashMap<>();
+        }
+    }
+
+    public void writeMyEvents(){
+        File file = new File(getFilesDir(), getString(R.string.EventsFile));
+        try {
+            String path = file.getPath();
+            ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(path));
+            outputStream.writeObject(myEvents);
+            outputStream.close();
+        } catch (IOException e){
+            file.delete();
+        }
     }
 
     @Override
@@ -96,6 +151,7 @@ public class WarhornActivity extends AppCompatActivity implements EventInfoFragm
         AuthManager.writeAuthState(this, authState);
         authState = null;
         authService.dispose();
+        writeMyEvents();
     }
 
     //Extracts Authorization response from intent and sends to getUserToken()
@@ -240,9 +296,37 @@ public class WarhornActivity extends AppCompatActivity implements EventInfoFragm
                 });
     }
 
+    private void getEventName(final String slug){
+        if(apolloClient == null){
+            Log.d(TAG, "Unable to query at this time");
+            return;
+        }
+        apolloClient.query(new EventTitleQuery(slug))
+                .enqueue(new ApolloCall.Callback<EventTitleQuery.Data>() {
+                    @Override
+                    public void onResponse(@NotNull com.apollographql.apollo.api.Response<EventTitleQuery.Data> response) {
+                        Log.d("Apollo", response.getData().toString());
+                        Message msg = Message.obtain();
+                        String messageContents[] = {response.getData().event.title, slug};
+                        msg.obj = messageContents;
+                        EventTitleHandler.sendMessage(msg);
+                    }
+
+                    @Override
+                    public void onFailure(@NotNull ApolloException e) {
+                        Log.e("Apollo", "Error", e);
+                    }
+                });
+    }
+
     @Override
-    public void addEvent(String slug) {
-        Log.d(TAG, slug);
+    public void addEvent(final String slug) {
+        new Thread(){
+            @Override
+            public void run() {
+                getEventName(slug);
+            }
+        }.start();
     }
 
     //Class used to add authorization to each graphql query/mutation
