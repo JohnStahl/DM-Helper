@@ -62,6 +62,7 @@ public class WarhornActivity extends AppCompatActivity implements EventInfoFragm
             if(!myEvents.containsKey(contents[0])) {
                 myEvents.put(contents[0], contents[1]);
             }
+            ((EventInfoFragment)EventInfo).updateEventSpinner(contents[0]);
             //Log.d(TAG, myEvents.toString());
             return false;
         }
@@ -84,12 +85,23 @@ public class WarhornActivity extends AppCompatActivity implements EventInfoFragm
 
         EventInfo = getSupportFragmentManager().findFragmentById(R.id.Event_Info);
         if(!(EventInfo instanceof EventInfoFragment)){
-            EventInfo = new EventInfoFragment();
+            getMyEvents();
+            String[] eventNames = getEventNames();
+            EventInfo = EventInfoFragment.newInstance(eventNames);
             getSupportFragmentManager()
                     .beginTransaction()
                     .add(R.id.Event_Info ,EventInfo)
                     .commit();
         }
+    }
+
+    private String[] getEventNames(){
+        Object[] objectEventNames = myEvents.keySet().toArray();
+        String[] stringEventNames = new String[objectEventNames.length];
+        for(int i = 0; i < objectEventNames.length; i++){
+            stringEventNames[i] = objectEventNames[i].toString();
+        }
+        return stringEventNames;
     }
 
     @Override
@@ -112,7 +124,8 @@ public class WarhornActivity extends AppCompatActivity implements EventInfoFragm
                 getUserInfo();
             }
         }
-        getMyEvents();
+        if(myEvents == null)
+            getMyEvents();
     }
 
     public void getMyEvents() {
