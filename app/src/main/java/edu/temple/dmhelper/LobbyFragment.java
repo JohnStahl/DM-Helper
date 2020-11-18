@@ -18,8 +18,6 @@ import java.util.List;
  * create an instance of this fragment.
  */
 public class LobbyFragment extends Fragment {
-    public static final String ARG_CHARACTERS = "Characters";
-
     private List<Character> characters;
 
     public LobbyFragment() {
@@ -32,25 +30,13 @@ public class LobbyFragment extends Fragment {
      *
      * @return A new instance of fragment LobbyFragment.
      */
-    public static LobbyFragment newInstance(ArrayList<Character> characters) {
-        LobbyFragment fragment = new LobbyFragment();
-        Bundle args = new Bundle();
-        args.putParcelableArrayList(ARG_CHARACTERS, characters);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     public static LobbyFragment newInstance() {
-        return newInstance(new ArrayList<Character>());
+        return new LobbyFragment();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            ArrayList<Character> characters = getArguments().getParcelableArrayList(ARG_CHARACTERS);
-            if (characters != null) this.characters.addAll(characters);
-        }
     }
 
     @Override

@@ -8,19 +8,25 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
+import java.util.List;
+
 import edu.temple.dmhelper.bluetooth.DiscoveryActivity;
 import edu.temple.dmhelper.bluetooth.JoinGameActivity;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ActionInterface {
     public static final String TAG = "MainActivity";
 
     public static final int REQUEST_DISCOVER_DEVICE = 1001;
     public static final int REQUEST_JOIN_GAME = 1002;
 
+    private LobbyFragment lobbyFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        lobbyFragment = LobbyFragment.newInstance();
 
         startDiscoveryActivity();
     }
@@ -35,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == REQUEST_DISCOVER_DEVICE) {
+        if (requestCode == REQUEST_DISCOVER_DEVICE) { // DiscoveryActivity finished
             if (resultCode == RESULT_OK && data != null) {
                 BluetoothDevice device = data.getParcelableExtra(DiscoveryActivity.EXTRA_DEVICE);
                 if (device != null) {
@@ -47,9 +53,9 @@ public class MainActivity extends AppCompatActivity {
                 }
             } else {
                 Log.d(TAG, "Discovery cancelled");
-                // TODO: Handle discovery cancelled
+                showMainMenu();
             }
-        } else if (requestCode == REQUEST_JOIN_GAME) {
+        } else if (requestCode == REQUEST_JOIN_GAME) { // JoinGameActivity finished
             if (resultCode == RESULT_OK && data != null) {
                 Character character = data.getParcelableExtra(JoinGameActivity.EXTRA_CHARACTER);
                 BluetoothDevice device = data.getParcelableExtra(JoinGameActivity.EXTRA_DEVICE);
@@ -60,8 +66,42 @@ public class MainActivity extends AppCompatActivity {
                 }
             } else {
                 Log.d(TAG, "Join game cancelled");
-                // TODO: Handle join game cancelled
+                showMainMenu();
             }
         }
+    }
+
+    public void showLobby() {
+        
+    }
+
+    @Override
+    public void joinGame() {
+        startDiscoveryActivity();
+    }
+
+    @Override
+    public void createGame() {
+
+    }
+
+    @Override
+    public void startGame(List<Character> characters) {
+
+    }
+
+    @Override
+    public void showDiceRoller() {
+
+    }
+
+    @Override
+    public void showWarhorn() {
+
+    }
+
+    @Override
+    public void showMainMenu() {
+
     }
 }
