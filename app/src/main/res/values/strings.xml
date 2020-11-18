@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">DM Helper</string>
 
-    <string name="login_button_name">Login</string>
+    <string name="login_button_name">Warhorn Login</string>
     <string name="host_url">https://dm-helper.netlify.app</string>
     <string name="redirect_url">https://dm-helper.netlify.app</string>
     <string name="auth_end_point">https://warhorn.net/oauth/authorize</string>
@@ -29,8 +29,13 @@
         permission we are unable to find the DM\'s device to establish a connection.
     </string>
 
+    <string name="join_game_title">Joining game</string>
     <string name="character_name">Character Name</string>
     <string name="character_initiative">Character Initiative</string>
-    <string name="join_game">Join</string>
-    <string name="join_game_title">Joining game</string>
+
+    <string name="main_menu_title">DM Helper Main Menu</string>
+    <string name="join_game">Join Game</string>
+    <string name="create_game">Create Game</string>
+    <string name="dice_roller">Dice Roller</string>
+    <string name="warhorn">Warhorn</string>
 </resources>

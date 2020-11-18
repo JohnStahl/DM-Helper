@@ -3,6 +3,8 @@ package edu.temple.dmhelper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import android.app.PendingIntent;
 import android.content.ComponentName;
@@ -73,17 +75,11 @@ public class MainActivity extends AppCompatActivity implements ActionInterface {
 
         lobbyFragment = LobbyFragment.newInstance();
 
-        startDiscoveryActivity();
-        findViewById(R.id.warhorn_login).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    authorize();
-                } catch (JSONException e) {
-                    Log.d(TAG, "JSON error during authorization");
-                }
-            }
-        });
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        Fragment fragment = fragmentManager.findFragmentById(R.id.frameLayout);
+        if (fragment == null) {
+            showMainMenu();
+        }
 
         Intent bluetoothServiceIntent = new Intent(this, BluetoothService.class);
         startService(bluetoothServiceIntent);
@@ -199,16 +195,28 @@ public class MainActivity extends AppCompatActivity implements ActionInterface {
 
     @Override
     public void showDiceRoller() {
-
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.frameLayout, new DiceRollerFragment())
+                .addToBackStack(null)
+                .commit();
     }
 
     @Override
     public void showWarhorn() {
-
+        try {
+            authorize();
+        } catch (JSONException e) {
+            Log.e(TAG, "JSON error during authorization", e);
+        }
     }
 
     @Override
     public void showMainMenu() {
-
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.frameLayout, new MainMenuFragment())
+                .addToBackStack(null)
+                .commit();
     }
 }
