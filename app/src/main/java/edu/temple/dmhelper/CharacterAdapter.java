@@ -40,9 +40,7 @@ public class CharacterAdapter extends BaseAdapter {
                 LayoutInflater.from(context).inflate(R.layout.character, parent, false);
         Character character = getItem(position);
         ((TextView) root.findViewById(R.id.charactersName)).setText(character.getName());
-        ((TextView) root.findViewById(R.id.charactersInitiative)).setText(
-                context.getResources().getStringArray(R.array.initiatives)[character.getInitiative()]
-        );
+        ((TextView) root.findViewById(R.id.charactersInitiative)).setText(character.getInitiative());
         return root;
     }
 

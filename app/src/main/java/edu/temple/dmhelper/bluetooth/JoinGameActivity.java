@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.text.InputFilter;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -18,6 +19,7 @@ import java.util.UUID;
 
 import edu.temple.dmhelper.Character;
 import edu.temple.dmhelper.R;
+import edu.temple.dmhelper.utilities.InputFilterMinMax;
 
 public class JoinGameActivity extends AppCompatActivity {
     private static final String TAG = "JoinGameActivity";
@@ -34,21 +36,17 @@ public class JoinGameActivity extends AppCompatActivity {
 
         final BluetoothDevice device = getIntent().getParcelableExtra(EXTRA_DEVICE);
         final EditText nameField = findViewById(R.id.characterName);
-        final Spinner initiativeSpin = findViewById(R.id.characterInitiative);
+        final EditText initiativeField = findViewById(R.id.characterInitiative);
+
+        int min = getResources().getInteger(R.integer.initiative_min);
+        int max = getResources().getInteger(R.integer.initiative_max);
+        initiativeField.setFilters(new InputFilter[]{ new InputFilterMinMax(min, max)});
 
         if (device == null) {
             Log.e(TAG, "EXTRA_DEVICE extra must not be null");
             finish();
             return;
         }
-
-        ArrayAdapter<CharSequence> initiativeAdapter = ArrayAdapter.createFromResource(
-                this,
-                R.array.initiatives,
-                android.R.layout.simple_spinner_item
-        );
-        initiativeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        initiativeSpin.setAdapter(initiativeAdapter);
 
         ((TextView) findViewById(R.id.device)).setText(device.getName());
 
@@ -57,7 +55,7 @@ public class JoinGameActivity extends AppCompatActivity {
             public void onClick(View v) {
                 UUID id = UUID.randomUUID();
                 String name = nameField.getText().toString();
-                int initiative = initiativeSpin.getSelectedItemPosition();
+                int initiative = Integer.parseInt(initiativeField.getText().toString());
                 Character character = new Character(name, initiative, id);
 
                 Intent intent = new Intent(ACTION_CHARACTER_CREATED);
