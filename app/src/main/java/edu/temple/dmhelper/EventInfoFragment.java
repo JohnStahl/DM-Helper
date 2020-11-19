@@ -1,6 +1,8 @@
 package edu.temple.dmhelper;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -8,6 +10,8 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,24 +20,43 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class EventInfoFragment extends Fragment implements AdapterView.OnItemSelectedListener {
     private static final String TAG = "Event Fragment";
     private static final String EVENTS_KEY = "events";
+    private static final String MESSAGE_URL_KEY = "URL";
+
+    Handler PictureLoadingHandler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(@NonNull Message msg) {
+            Bitmap picture = (Bitmap) msg.obj;
+            ImageView coverArt = coverArts.get(msg.arg1);
+            coverArt.setImageBitmap(picture);
+            return false;
+        }
+    });
+
     GraphQLListener mListener;
 
     ArrayList<String> events;
     Spinner currentEvent;
     SpinnerAdapter spinnerAdapter;
     LinearLayout sessionList;
+    ArrayList<ImageView> coverArts;
 
     public EventInfoFragment() {
         // Required empty public constructor
@@ -97,11 +120,23 @@ public class EventInfoFragment extends Fragment implements AdapterView.OnItemSel
     }
 
     public void displaySessions(List<SessionsQuery.Node> sessions){
+        ArrayList<String> urls = new ArrayList<>();
+        coverArts = new ArrayList<>();
         for(SessionsQuery.Node session : sessions){
             //Log.d(TAG, "Adding view");
-            sessionList.addView(createSessionView(session));
+            //Create View for each session
+            View sessionView = createSessionView(session);
+            //Add image view and url to our map, which will be used to download picture in seperate thread
+            String coverArtUrl = session.scenarioOffering.scenario.coverArtUrl;
+            if(coverArtUrl != null && coverArtUrl.length() > 0) {
+                urls.add(coverArtUrl);
+                coverArts.add((ImageView)sessionView.findViewById(R.id.CoverArt));
+            }
+            //Add created view to our linear layout in the scroll view
+            sessionList.addView(sessionView);
         }
-        Log.d(TAG, "Added all sessions");
+        //Thread that will go through and add all of the cover art pictures to our sessions
+        new ImageDownloadThread(urls).start();
     }
 
     private View createSessionView(SessionsQuery.Node session){
@@ -197,6 +232,31 @@ public class EventInfoFragment extends Fragment implements AdapterView.OnItemSel
             }
             toReturn.setText(events.get(i));
             return toReturn;
+        }
+    }
+
+    public class ImageDownloadThread extends Thread{
+        ArrayList<String> urls;
+
+        public ImageDownloadThread(ArrayList<String> urls){
+            this.urls = urls;
+        }
+        @Override
+        public void run() {
+            for(int i = 0; i < urls.size(); i++){
+                try {
+                    URL url = new URL(urls.get(i));
+                    Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+                    Message msg = Message.obtain();
+                    msg.obj = bmp;
+                    msg.arg1 = i;
+                    PictureLoadingHandler.sendMessage(msg);
+                }catch (MalformedURLException e) {
+                    Log.d(TAG, "Picture URL is invalid");
+                } catch (IOException e) {
+                    Log.d(TAG, "Unable to open stream from picture URL");
+                }
+            }
         }
     }
 }
