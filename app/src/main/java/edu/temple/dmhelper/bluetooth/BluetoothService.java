@@ -125,6 +125,8 @@ public class BluetoothService extends Service {
             acceptClients = false;
             this.serverSocket.close();
             this.serverSocket = null;
+            for (BluetoothConnection conn : clients) conn.disconnect();
+            clients.clear();
         }
     }
 

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -61,10 +62,10 @@ public class LobbyFragment extends Fragment {
         Button startGameButton = root.findViewById(R.id.startGameButton);
         Button endGameButton = root.findViewById(R.id.endGameButton);
 
-        if (actionInterface.isDm()) {
-            startGameButton.setVisibility(View.VISIBLE);
-            endGameButton.setVisibility(View.VISIBLE);
-        }
+
+        int visibility = actionInterface.isDm() ? View.VISIBLE : View.GONE;
+        startGameButton.setVisibility(visibility);
+        endGameButton.setVisibility(visibility);
 
         startGameButton.setOnClickListener(new View.OnClickListener() {
             @Override

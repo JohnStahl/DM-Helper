@@ -94,6 +94,7 @@ public class MainActivity extends AppCompatActivity implements ActionInterface {
                         // TODO: Show Initiative Tracker
                         break;
                     case GameEndMessage.TYPE:
+                        btBinder.disconnect();
                         showMainMenu();
                         break;
                     case NextRoundMessage.TYPE:
@@ -244,6 +245,7 @@ public class MainActivity extends AppCompatActivity implements ActionInterface {
     public void endGame() {
         if (btServiceBound && isDm()) {
             try {
+                btBinder.sendMessage(new GameEndMessage());
                 btBinder.stopServer();
             } catch (IOException e) {
                 Log.e(TAG, "Unable to stop server", e);

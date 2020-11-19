@@ -21,7 +21,7 @@ public class CharacterAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return 0;
+        return this.characters.size();
     }
 
     @Override

@@ -22,6 +22,8 @@ public class BluetoothConnection extends Thread {
     private final ObjectInputStream in;
     private final ObjectOutputStream out;
 
+    private volatile boolean connected;
+
     public BluetoothConnection(BluetoothSocket socket, BluetoothDevice device, Handler handler, boolean server) throws IOException {
         this.socket = socket;
         this.device = device;
@@ -34,11 +36,13 @@ public class BluetoothConnection extends Thread {
             this.out = new ObjectOutputStream(socket.getOutputStream());
             this.in = new ObjectInputStream(socket.getInputStream());
         }
+
+        this.connected = true;
     }
 
     @Override
     public void run() {
-        while (!interrupted()) {
+        while (connected && !interrupted()) {
             try {
                 BluetoothMessage btMsg = (BluetoothMessage) in.readObject();
                 Log.d(TAG, "Received message: " + btMsg);
@@ -62,15 +66,15 @@ public class BluetoothConnection extends Thread {
     }
 
     void disconnect() {
+        connected = false;
         try {
+            this.interrupt();
             this.in.close();
             this.out.close();
             this.socket.close();
         } catch (IOException e) {
             Log.e(TAG, "Failed to disconnect from the socket", e);
         }
-
-        this.interrupt();
     }
 
     public interface OnConnectCallback {
