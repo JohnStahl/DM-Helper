@@ -43,6 +43,8 @@ public class EventInfoFragment extends Fragment implements AdapterView.OnItemSel
     Handler PictureLoadingHandler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(@NonNull Message msg) {
+            if(coverArts.size() < msg.arg1)
+                return false;
             Bitmap picture = (Bitmap) msg.obj;
             ImageView coverArt = coverArts.get(msg.arg1);
             coverArt.setImageBitmap(picture);
@@ -120,6 +122,7 @@ public class EventInfoFragment extends Fragment implements AdapterView.OnItemSel
     }
 
     public void displaySessions(List<SessionsQuery.Node> sessions){
+        sessionList.removeAllViews();
         ArrayList<String> urls = new ArrayList<>();
         coverArts = new ArrayList<>();
         for(SessionsQuery.Node session : sessions){
@@ -223,6 +226,13 @@ public class EventInfoFragment extends Fragment implements AdapterView.OnItemSel
         }
 
         @Override
+        public View getDropDownView(int position, View convertView, ViewGroup parent) {
+            TextView view = (TextView) getView(position, convertView, parent);
+            view.setTextSize(30);
+            return view;
+        }
+
+        @Override
         public View getView(int i, View view, ViewGroup viewGroup) {
             TextView toReturn;
             if(!(view instanceof TextView)) {
@@ -231,6 +241,7 @@ public class EventInfoFragment extends Fragment implements AdapterView.OnItemSel
                 toReturn = (TextView)view;
             }
             toReturn.setText(events.get(i));
+            toReturn.setTextSize(20);
             return toReturn;
         }
     }

@@ -10,25 +10,27 @@
         android:id="@+id/CoverArt"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintVertical_weight="8"
-        app:layout_constraintHorizontal_weight="4"
+        android:layout_marginTop="5dp"
         app:layout_constraintBottom_toTopOf="@+id/Time"
         app:layout_constraintEnd_toStartOf="@+id/ScenarioName"
+        app:layout_constraintHorizontal_weight="4"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_weight="8"
         tools:srcCompat="@tools:sample/avatars" />
 
     <TextView
         android:id="@+id/CampaignName"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintVertical_weight="2"
-        app:layout_constraintHorizontal_weight="6"
+        android:layout_marginTop="5dp"
         android:text="TextView"
         app:layout_constraintBottom_toTopOf="@+id/ScenarioName"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_weight="6"
         app:layout_constraintStart_toEndOf="@+id/CoverArt"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_weight="2" />
 
     <TextView
         android:id="@+id/ScenarioName"
@@ -70,11 +72,12 @@
         android:id="@+id/Time"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintVertical_weight="2"
-        app:layout_constraintHorizontal_weight="10"
+        android:layout_marginStart="5dp"
         android:text="TextView"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_weight="10"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/CoverArt"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintVertical_weight="2" />
 </androidx.constraintlayout.widget.ConstraintLayout>
