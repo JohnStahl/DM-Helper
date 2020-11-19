@@ -1,16 +1,15 @@
 package edu.temple.dmhelper;
 
-import android.content.Context;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
+
+import java.util.List;
 
 
 /**
@@ -18,24 +17,21 @@ import android.view.ViewGroup;
  */
 public class CharacterListFragment extends Fragment {
 
-    // TODO: Customize parameter argument names
-    private static final String ARG_COLUMN_COUNT = "column-count";
-    // TODO: Customize parameters
-    private int mColumnCount = 1;
+    private static final String CHARACTER_LIST_KEY = "characterlist";
+    private CharacterList characters;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public CharacterListFragment() {
-    }
+    public CharacterListFragment() {}
 
-    // TODO: Customize parameter initialization
-    @SuppressWarnings("unused")
-    public static CharacterListFragment newInstance(int columnCount) {
+
+
+    public static CharacterListFragment newInstance(CharacterList characters) {
         CharacterListFragment fragment = new CharacterListFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_COLUMN_COUNT, columnCount);
+        args.putSerializable(CHARACTER_LIST_KEY, characters);
         fragment.setArguments(args);
         return fragment;
     }
@@ -45,16 +41,18 @@ public class CharacterListFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
-            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
+            characters = (CharacterList) getArguments().getSerializable(CHARACTER_LIST_KEY);
         }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_character_list_list, container, false);
+        ListView listview = (ListView)inflater.inflate(R.layout.fragment_character_list, container, false);
+
+        listview.setAdapter(new CharacterAdapter(getContext(), characters));
 
 
-        return view;
+        return listview;
     }
 }
