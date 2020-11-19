@@ -43,9 +43,9 @@ public class BluetoothService extends Service {
             BluetoothService.this.sendMessage(message);
         }
 
-        public void connectToServer(BluetoothDevice device, Handler handler) throws IOException {
+        public void connectToServer(BluetoothDevice device, Handler handler, BluetoothConnection.OnConnectCallback cb) throws IOException {
             BluetoothService.this.handler = handler;
-            BluetoothService.this.connectToServer(device);
+            BluetoothService.this.connectToServer(device, cb);
         }
 
         public void disconnect() {
@@ -56,8 +56,8 @@ public class BluetoothService extends Service {
     // Properties for server
     private volatile boolean acceptClients = true;
     private BluetoothServerSocket serverSocket = null;
-    private List<BluetoothConnection> clients = new ArrayList<>();
-    private Thread clientAcceptor = new Thread() {
+    private final List<BluetoothConnection> clients = new ArrayList<>();
+    private final Thread clientAcceptor = new Thread() {
         @Override
         public void run() {
             if (!connected || !server) return;
@@ -71,8 +71,14 @@ public class BluetoothService extends Service {
                     break;
                 }
 
+                if (socket == null) continue;
+
                 try {
-                    clients.add(new BluetoothConnection(socket, socket.getRemoteDevice(), handler));
+                    BluetoothDevice device = socket.getRemoteDevice();
+                    Log.d(TAG, "Opening connection to the client " + device.getName() + " (" + device.getAddress() + ")");
+                    BluetoothConnection conn = new BluetoothConnection(socket, device, handler, true);
+                    clients.add(conn);
+                    conn.start();
                 } catch (IOException ex) {
                     Log.e(TAG, "Failed to open connection to client", ex);
                     break;
@@ -104,7 +110,7 @@ public class BluetoothService extends Service {
         if (!connected) {
             server = true;
             connected = true;
-            this.serverSocket = this.btAdapter.listenUsingInsecureRfcommWithServiceRecord("DM's Device", SERVICE_ID);
+            this.serverSocket = this.btAdapter.listenUsingRfcommWithServiceRecord("DM's Device", SERVICE_ID);
             this.clientAcceptor.start();
         }
     }
@@ -117,7 +123,6 @@ public class BluetoothService extends Service {
         if (connected && server) {
             connected = false;
             acceptClients = false;
-            clientAcceptor.interrupt();
             this.serverSocket.close();
             this.serverSocket = null;
         }
@@ -132,11 +137,25 @@ public class BluetoothService extends Service {
         }
     }
 
-    void connectToServer(BluetoothDevice device) throws IOException {
+    void connectToServer(BluetoothDevice device, final BluetoothConnection.OnConnectCallback cb) throws IOException {
         if (!connected) {
-            this.serverConnection = BluetoothConnection.connect(device, handler);
             server = false;
-            connected = true;
+            BluetoothConnection.connect(device, handler, new BluetoothConnection.OnConnectCallback() {
+                @Override
+                public void onConnect(BluetoothConnection connection) {
+                    Log.d(TAG, "Successfully connected to the server");
+                    connected = true;
+                    serverConnection = connection;
+                    cb.onConnect(connection);
+                }
+
+                @Override
+                public void onConnectFailed() {
+                    Log.e(TAG, "Failed to connect to the server");
+                    connected = false;
+                    cb.onConnectFailed();
+                }
+            });
         }
     }
 

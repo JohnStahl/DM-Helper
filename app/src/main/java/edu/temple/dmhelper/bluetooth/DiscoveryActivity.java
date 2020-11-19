@@ -139,7 +139,7 @@ public class DiscoveryActivity extends AppCompatActivity {
         title.setText(deviceAdapter.getCount() < 1 ?
                 R.string.bluetooth_no_devices : R.string.bluetooth_finished_discover);
 
-        if (btAdapter != null)
+        if (btAdapter != null && btAdapter.isDiscovering())
             btAdapter.cancelDiscovery();
     }
 

@@ -1,17 +1,18 @@
 package edu.temple.dmhelper;
 
+import android.content.Context;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ListView;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.function.Predicate;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -19,10 +20,9 @@ import java.util.function.Predicate;
  * create an instance of this fragment.
  */
 public class LobbyFragment extends Fragment {
-    private final ArrayList<Character> characters;
+    private CharacterAdapter characterAdapter;
 
     public LobbyFragment() {
-        this.characters = new ArrayList<>();
     }
 
     /**
@@ -35,9 +35,18 @@ public class LobbyFragment extends Fragment {
         return new LobbyFragment();
     }
 
+    private ActionInterface actionInterface;
+
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+
+        this.characterAdapter = new CharacterAdapter(context);
+        if (context instanceof ActionInterface) {
+            actionInterface = (ActionInterface) context;
+        } else {
+            throw new RuntimeException(context.getClass().getName() + " must implement ActionInterface.");
+        }
     }
 
     @Override
@@ -46,23 +55,48 @@ public class LobbyFragment extends Fragment {
         // Inflate the layout for this fragment
         View root = inflater.inflate(R.layout.fragment_lobby, container, false);
 
+        ListView charactersList = root.findViewById(R.id.characters);
+        charactersList.setAdapter(characterAdapter);
+
+        Button startGameButton = root.findViewById(R.id.startGameButton);
+        Button endGameButton = root.findViewById(R.id.endGameButton);
+
+        if (actionInterface.isDm()) {
+            startGameButton.setVisibility(View.VISIBLE);
+            endGameButton.setVisibility(View.VISIBLE);
+        }
+
+        startGameButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                actionInterface.startGame(characterAdapter.getAll());
+            }
+        });
+
+        endGameButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                actionInterface.endGame();
+                actionInterface.showMainMenu();
+            }
+        });
+
         return root;
     }
 
     public void addCharacter(Character character) {
-        if (!characters.contains(character))
-            this.characters.add(character);
+        characterAdapter.addItem(character);
     }
 
     public void removeCharacter(Character character) {
-        this.characters.remove(character);
+        characterAdapter.removeItem(character);
     }
 
     public void addCharacters(ArrayList<Character> characters) {
-        for (Character character : characters) addCharacter(character);
+        characterAdapter.addItems(characters);
     }
 
     public ArrayList<Character> getCharacters() {
-        return this.characters;
+        return this.characterAdapter.getAll();
     }
 }

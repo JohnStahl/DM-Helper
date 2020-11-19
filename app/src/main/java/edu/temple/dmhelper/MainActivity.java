@@ -29,6 +29,7 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.util.List;
 
+import edu.temple.dmhelper.bluetooth.BluetoothConnection;
 import edu.temple.dmhelper.bluetooth.BluetoothService;
 import edu.temple.dmhelper.bluetooth.DiscoveryActivity;
 import edu.temple.dmhelper.bluetooth.JoinGameActivity;
@@ -66,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements ActionInterface {
         @Override
         public boolean handleMessage(@NonNull Message androidMsg) {
             BluetoothMessage msg = (BluetoothMessage) androidMsg.obj;
-            if (((DmhelperApplication) getApplication()).isDm()) { // Message from client to server
+            if (isDm()) { // Message from client to server
                 switch (msg.getType()) {
                     case PlayerJoinMessage.TYPE:
                         lobbyFragment.addCharacter(((PlayerJoinMessage) msg).getPlayer());
@@ -165,13 +166,12 @@ public class MainActivity extends AppCompatActivity implements ActionInterface {
             }
         } else if (requestCode == REQUEST_JOIN_GAME) { // JoinGameActivity finished
             if (resultCode == RESULT_OK && data != null) {
-                Character character = data.getParcelableExtra(JoinGameActivity.EXTRA_CHARACTER);
+                Character character = (Character) data.getSerializableExtra(JoinGameActivity.EXTRA_CHARACTER);
                 BluetoothDevice device = data.getParcelableExtra(JoinGameActivity.EXTRA_DEVICE);
 
                 if (device != null && character != null) {
                     Log.d(TAG, "Character created: " + character.toString());
-                    if (connectToServer(device, character))
-                        showLobby();
+                    connectToServer(device, character);
                 }
             } else {
                 Log.d(TAG, "Join game cancelled");
@@ -180,20 +180,28 @@ public class MainActivity extends AppCompatActivity implements ActionInterface {
         }
     }
 
-    private boolean connectToServer(BluetoothDevice device, Character character) {
-        if (!btServiceBound) return false;
+    private void connectToServer(BluetoothDevice device, final Character character) {
+        if (!btServiceBound) return;
 
         try {
             ((DmhelperApplication) getApplication()).setDm(false);
-            btBinder.connectToServer(device, messageHandler);
-            btBinder.sendMessage(new PlayerJoinMessage(character));
+            btBinder.connectToServer(device, messageHandler, new BluetoothConnection.OnConnectCallback() {
+                @Override
+                public void onConnect(BluetoothConnection connection) {
+                    connection.sendMessage(new PlayerJoinMessage(character));
+                    showLobby();
+                }
+
+                @Override
+                public void onConnectFailed() {
+                    showMainMenu();
+                }
+            });
         } catch (IOException e) {
             Log.e(TAG, "Unable to connect to the server", e);
             showMainMenu();
             Toast.makeText(this, getString(R.string.bluetooth_failed_to_connect, device.getName()), Toast.LENGTH_LONG).show();
         }
-
-        return true;
     }
 
     public void showLobby() {
@@ -226,8 +234,20 @@ public class MainActivity extends AppCompatActivity implements ActionInterface {
     @Override
     public void startGame(List<Character> characters) {
         if (btServiceBound) {
+            btBinder.stopAcceptingClients();
             btBinder.sendMessage(new GameStartMessage());
             // TODO: Show Initiative tracker
+        }
+    }
+
+    @Override
+    public void endGame() {
+        if (btServiceBound && isDm()) {
+            try {
+                btBinder.stopServer();
+            } catch (IOException e) {
+                Log.e(TAG, "Unable to stop server", e);
+            }
         }
     }
 
@@ -256,5 +276,10 @@ public class MainActivity extends AppCompatActivity implements ActionInterface {
                 .replace(R.id.frameLayout, new MainMenuFragment())
                 .addToBackStack(null)
                 .commit();
+    }
+
+    @Override
+    public boolean isDm() {
+        return ((DmhelperApplication) getApplication()).isDm();
     }
 }
