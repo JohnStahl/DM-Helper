@@ -9,12 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-import java.util.List;
 
 
-/**
- * A fragment representing a list of Items.
- */
+
 public class CharacterListFragment extends Fragment {
 
     private static final String CHARACTER_LIST_KEY = "characterlist";
@@ -42,6 +39,8 @@ public class CharacterListFragment extends Fragment {
 
         if (getArguments() != null) {
             characters = (CharacterList) getArguments().getSerializable(CHARACTER_LIST_KEY);
+        } else {
+            characters = new CharacterList();
         }
     }
 

@@ -39,17 +39,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getSupportFragmentManager().beginTransaction().replace(R.id.container1, InitiativeTrackerFragment.newInstance()).commit();
 
-        findViewById(R.id.warhorn_login).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    authorize();
-                } catch (JSONException e) {
-                    Log.d(TAG, "JSON error during authorization");
-                }
-            }
-        });
     }
 
     //Called by warhorn fragment to initialize login by user into their warhorn fragment
