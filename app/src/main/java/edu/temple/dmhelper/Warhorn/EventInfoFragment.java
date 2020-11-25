@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
@@ -41,10 +42,11 @@ public class EventInfoFragment extends Fragment implements AdapterView.OnItemSel
     Handler PictureLoadingHandler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(@NonNull Message msg) {
-            if(coverArts.size() < msg.arg1)
+            if(sessionViews.size() < msg.arg1)
                 return false;
             Bitmap picture = (Bitmap) msg.obj;
-            ImageView coverArt = coverArts.get(msg.arg1);
+            View sessionView = sessionViews.get(msg.arg1);
+            ImageView coverArt = sessionView.findViewById(R.id.CoverArt);
             coverArt.setImageBitmap(picture);
             return false;
         }
@@ -56,7 +58,7 @@ public class EventInfoFragment extends Fragment implements AdapterView.OnItemSel
     Spinner currentEvent;
     SpinnerAdapter spinnerAdapter;
     LinearLayout sessionList;
-    ArrayList<ImageView> coverArts;
+    ArrayList<View> sessionViews;
     List<SessionsQuery.Node> currentSessions;
 
     public EventInfoFragment() {
@@ -124,7 +126,7 @@ public class EventInfoFragment extends Fragment implements AdapterView.OnItemSel
         //Set up/clean up our global variables before we start adding new sessions
         sessionList.removeAllViews();
         ArrayList<String> urls = new ArrayList<>();
-        coverArts = new ArrayList<>();
+        sessionViews = new ArrayList<>();
         currentSessions = sessions;
 
         for(SessionsQuery.Node session : sessions){
@@ -135,7 +137,9 @@ public class EventInfoFragment extends Fragment implements AdapterView.OnItemSel
             String coverArtUrl = session.scenarioOffering().scenario().coverArtUrl();
             if(coverArtUrl != null && coverArtUrl.length() > 0) {
                 urls.add(coverArtUrl);
-                coverArts.add((ImageView)sessionView.findViewById(R.id.CoverArt));
+                sessionViews.add(sessionView);
+            }else{
+                ((ImageView)sessionView.findViewById(R.id.CoverArt)).setImageResource(R.drawable.ddlogo);
             }
             //Add created view to our linear layout in the scroll view
             sessionList.addView(sessionView);

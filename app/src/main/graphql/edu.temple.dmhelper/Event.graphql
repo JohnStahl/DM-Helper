@@ -25,6 +25,28 @@ query Sessions($event: String!, $after: ISO8601DateTime!){
                 startsAt
                 endsAt
             }
+            playerSignups{
+                character{
+                    name
+                    notes
+                    player{
+                        name
+                    }
+                }
+                characterClass{
+                    name
+                }
+                combatRole
+                level
+            }
+            gmSignups{
+                registration{
+                    registrant{
+                        name
+                        email
+                    }
+                }
+            }
         }
     }
 }
