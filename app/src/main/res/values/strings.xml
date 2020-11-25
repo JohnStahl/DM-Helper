@@ -15,6 +15,7 @@
     <string name="hello_blank_fragment">Blank</string>
     <string name="AddButtonText">+ Add</string>
     <string name="EventDialogue">Please enter the event slug you wish to add</string>
+    <string name="EventNotFound">Event could not be found. Please double check provided slug.</string>
     <string name="AddEvent">Add</string>
     <string name="CancelEvent">Cancel</string>
     <string name="EventsFile">Events</string>

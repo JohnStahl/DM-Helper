@@ -78,6 +78,14 @@ public class WarhornActivity extends AppCompatActivity implements EventInfoFragm
         }
     });
 
+    Handler AddEventAgainHandler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(@NonNull Message message) {
+            showEventDialogue(true);
+            return false;
+        }
+    });
+
     Map<String, String> myEvents;
 
     public static final String TAG = "Warhorn Activity";
@@ -295,7 +303,11 @@ public class WarhornActivity extends AppCompatActivity implements EventInfoFragm
 
     @Override
     public void startEventDialogue() {
-        DialogFragment eventDialogue = new AddEventDialogue();
+        showEventDialogue(false);
+    }
+
+    private void showEventDialogue(boolean error){
+        DialogFragment eventDialogue = AddEventDialogue.newInstance(error);
         eventDialogue.show(getSupportFragmentManager(), "add event");
     }
 
@@ -306,8 +318,10 @@ public class WarhornActivity extends AppCompatActivity implements EventInfoFragm
             return;
         }
         String slug = myEvents.get(eventName);
+        //Get the current date to only show sessions that have not happened yet
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm"); // Quoted "Z" to indicate UTC, no timezone offset
         String now = df.format(new Date());
+
         Log.d("Apollo", "Attempting to query with this slug: " + slug);
         apolloClient.query(new SessionsQuery(slug, now))
                 .enqueue(new ApolloCall.Callback<SessionsQuery.Data>() {
@@ -324,7 +338,8 @@ public class WarhornActivity extends AppCompatActivity implements EventInfoFragm
 
                     @Override
                     public void onFailure(@NotNull ApolloException e) {
-                        Log.e("Apollo", "Error", e);
+                        //Log.e("Apollo", "Error", e);
+                        showEventDialogue(true);
                     }
                 });
     }
@@ -347,7 +362,8 @@ public class WarhornActivity extends AppCompatActivity implements EventInfoFragm
 
                     @Override
                     public void onFailure(@NotNull ApolloException e) {
-                        Log.e("Apollo", "Error", e);
+                        //Log.e("Apollo", "Error", e);
+                        AddEventAgainHandler.sendEmptyMessage(0);
                     }
                 });
     }

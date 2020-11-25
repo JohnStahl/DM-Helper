@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -16,7 +17,25 @@ import androidx.fragment.app.DialogFragment;
 import edu.temple.dmhelper.R;
 
 public class AddEventDialogue extends DialogFragment {
+    public static final String ERROR_KEY = "error";
     EventAdder myActivity;
+    boolean error;
+
+    public static AddEventDialogue newInstance(boolean error){
+        AddEventDialogue dialogue = new AddEventDialogue();
+        Bundle args = new Bundle();
+        args.putBoolean(ERROR_KEY, error);
+        dialogue.setArguments(args);
+        return dialogue;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if(getArguments() != null){
+            error = getArguments().getBoolean(ERROR_KEY);
+        }
+    }
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -41,6 +60,11 @@ public class AddEventDialogue extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View dialogue = inflater.inflate(R.layout.event_dialogue, null);
+        //Log.d("Event Dialogue", error + "");
+        if(error) {
+            //Present error message to user
+            dialogue.findViewById(R.id.errorMessage).setVisibility(View.VISIBLE);
+        }
         final EditText slug = dialogue.findViewById(R.id.slug);
         builder.setView(dialogue)
                 .setPositiveButton(R.string.AddEvent, new DialogInterface.OnClickListener() {
