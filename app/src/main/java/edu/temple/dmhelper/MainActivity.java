@@ -16,6 +16,8 @@ import org.json.JSONException;
 
 import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
 import android.bluetooth.BluetoothDevice;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 
 import edu.temple.dmhelper.Warhorn.WarhornActivity;
 import edu.temple.dmhelper.bluetooth.DiscoveryActivity;

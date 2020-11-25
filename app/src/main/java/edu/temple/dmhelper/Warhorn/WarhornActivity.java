@@ -6,7 +6,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -57,7 +59,7 @@ import okhttp3.OkHttpClient;
 
 
 public class WarhornActivity extends AppCompatActivity implements EventInfoFragment.GraphQLListener,
-        AddEventDialogue.EventAdder, SessionDetailsFragment.SessionDetailsListener {
+        AddEventDialogue.EventAdder {
     Handler EventTitleHandler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(@NonNull Message msg) {
@@ -348,12 +350,9 @@ public class WarhornActivity extends AppCompatActivity implements EventInfoFragm
 
     @Override
     public void viewSessionDetails(Session session) {
-        Fragment SessionDetails = SessionDetailsFragment.newInstance(session);
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.Event_Info, SessionDetails)
-                .addToBackStack(null)
-                .commit();
+        String url = session.signupURL;
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        startActivity(intent);
     }
 
     private void getEventName(final String slug){
@@ -388,11 +387,6 @@ public class WarhornActivity extends AppCompatActivity implements EventInfoFragm
                 getEventName(slug);
             }
         }.start();
-    }
-
-    @Override
-    public void exitSessionDetails() {
-        getSupportFragmentManager().popBackStack();
     }
 
     //Class used to add authorization to each graphql query/mutation

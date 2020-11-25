@@ -5,7 +5,7 @@ import java.io.Serializable;
 import edu.temple.dmhelper.SessionsQuery;
 
 public class Session implements Serializable {
-    protected String campaign, scenario, playerSeats, gmSeats, notes, blurb, time, pictureURL;
+    protected String campaign, scenario, playerSeats, gmSeats, notes, blurb, time, pictureURL, signupURL;
 
     public Session(SessionsQuery.Node session){
         //Following fields may be null; need to be checked before assignment
@@ -28,5 +28,6 @@ public class Session implements Serializable {
         pictureURL = session.scenarioOffering().scenario().coverArtUrl();
         notes = session.notes();
         blurb = session.scenarioOffering().scenario().blurb();
+        signupURL = session.signupUrl();
     }
 }
