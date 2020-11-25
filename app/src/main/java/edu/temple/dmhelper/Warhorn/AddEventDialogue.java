@@ -1,4 +1,4 @@
-package edu.temple.dmhelper;
+package edu.temple.dmhelper.Warhorn;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -12,6 +12,8 @@ import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+
+import edu.temple.dmhelper.R;
 
 public class AddEventDialogue extends DialogFragment {
     EventAdder myActivity;

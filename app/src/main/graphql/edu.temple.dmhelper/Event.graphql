@@ -4,8 +4,8 @@ query EventTitle($slug: String!){
     }
 }
 
-query Sessions($event: String!){
-    sessions(events: [$event]){
+query Sessions($event: String!, $after: ISO8601DateTime!){
+    sessions(events: [$event], startsAfter: $after){
         nodes{
             availableGmSeats
             availablePlayerSeats

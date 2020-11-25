@@ -1,4 +1,4 @@
-package edu.temple.dmhelper;
+package edu.temple.dmhelper.Warhorn;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -19,6 +19,8 @@ import android.widget.TextView;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import edu.temple.dmhelper.R;
 
 public class UserInfoFragment extends Fragment {
 

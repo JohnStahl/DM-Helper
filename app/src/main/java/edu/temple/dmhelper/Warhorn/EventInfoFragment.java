@@ -1,4 +1,4 @@
-package edu.temple.dmhelper;
+package edu.temple.dmhelper.Warhorn;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -17,12 +17,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -31,9 +28,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import edu.temple.dmhelper.R;
+import edu.temple.dmhelper.SessionsQuery;
 
 public class EventInfoFragment extends Fragment implements AdapterView.OnItemSelectedListener {
     private static final String TAG = "Event Fragment";
@@ -59,6 +57,7 @@ public class EventInfoFragment extends Fragment implements AdapterView.OnItemSel
     SpinnerAdapter spinnerAdapter;
     LinearLayout sessionList;
     ArrayList<ImageView> coverArts;
+    List<SessionsQuery.Node> currentSessions;
 
     public EventInfoFragment() {
         // Required empty public constructor
@@ -122,15 +121,18 @@ public class EventInfoFragment extends Fragment implements AdapterView.OnItemSel
     }
 
     public void displaySessions(List<SessionsQuery.Node> sessions){
+        //Set up/clean up our global variables before we start adding new sessions
         sessionList.removeAllViews();
         ArrayList<String> urls = new ArrayList<>();
         coverArts = new ArrayList<>();
+        currentSessions = sessions;
+
         for(SessionsQuery.Node session : sessions){
             //Log.d(TAG, "Adding view");
             //Create View for each session
             View sessionView = createSessionView(session);
             //Add image view and url to our map, which will be used to download picture in seperate thread
-            String coverArtUrl = session.scenarioOffering.scenario.coverArtUrl;
+            String coverArtUrl = session.scenarioOffering().scenario().coverArtUrl();
             if(coverArtUrl != null && coverArtUrl.length() > 0) {
                 urls.add(coverArtUrl);
                 coverArts.add((ImageView)sessionView.findViewById(R.id.CoverArt));
@@ -147,25 +149,24 @@ public class EventInfoFragment extends Fragment implements AdapterView.OnItemSel
         String campaignName, scenarioName, availablePlayerSeats, availableGMSeats, time;
 
         //Following fields may be null; need to be checked before assignment
-        if(session.scenarioOffering != null && session.scenarioOffering.scenario != null &&
-                session.scenarioOffering.scenario.campaign != null &&
-                session.scenarioOffering.scenario.campaign.name != null) {
-            campaignName = "Campaign: " + session.scenarioOffering.scenario.campaign.name;
+        if(session.scenarioOffering() != null && session.scenarioOffering().scenario() != null &&
+                session.scenarioOffering().scenario().campaign() != null &&
+                session.scenarioOffering().scenario().campaign().name() != null) {
+            campaignName = "Campaign: " + session.scenarioOffering().scenario().campaign().name();
         }else {
             campaignName = "No campaign name given";
         }
-        if(session.scenarioOffering.scenario.name != null)
-            scenarioName = "Scenario: " + session.scenarioOffering.scenario.name;
+        if(session.scenarioOffering().scenario().name() != null)
+            scenarioName = "Scenario: " + session.scenarioOffering().scenario().name();
         else
             scenarioName = "No Scenario name given";
-        if(session.slot != null)
-            time = session.slot.startsAt.toString() + "-" + session.slot.endsAt.toString();
+        if(session.slot() != null)
+            time = session.slot().startsAt().toString() + "-" + session.slot().endsAt().toString();
         else
             time = "No time given";
-
         //Following fields will never be null
-        availablePlayerSeats = "Player seats available: " + session.availablePlayerSeats;
-        availableGMSeats = "GM seats available: " + session.availableGmSeats;
+        availablePlayerSeats = "Player seats available: " + session.availablePlayerSeats();
+        availableGMSeats = "GM seats available: " + session.availableGmSeats();
 
         //Create View from layout file
         ConstraintLayout sessionView = (ConstraintLayout) getActivity().getLayoutInflater().inflate(R.layout.session, sessionList, false);
@@ -181,6 +182,7 @@ public class EventInfoFragment extends Fragment implements AdapterView.OnItemSel
         return sessionView;
     }
 
+    //Method that gets called when item is selected in spinner
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
         Log.d(TAG, events.get(i) + " was selected");

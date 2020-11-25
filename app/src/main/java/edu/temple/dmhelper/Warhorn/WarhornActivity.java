@@ -1,4 +1,4 @@
-package edu.temple.dmhelper;
+package edu.temple.dmhelper.Warhorn;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -7,13 +7,9 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.Parcelable;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
@@ -29,12 +25,8 @@ import com.apollographql.apollo.exception.ApolloException;
 
 import net.openid.appauth.AuthState;
 import net.openid.appauth.AuthorizationException;
-import net.openid.appauth.AuthorizationRequest;
 import net.openid.appauth.AuthorizationResponse;
 import net.openid.appauth.AuthorizationService;
-import net.openid.appauth.AuthorizationServiceConfiguration;
-import net.openid.appauth.ClientAuthentication;
-import net.openid.appauth.ResponseTypeValues;
 import net.openid.appauth.TokenResponse;
 
 import org.jetbrains.annotations.NotNull;
@@ -43,17 +35,22 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.temple.dmhelper.AuthManager;
+import edu.temple.dmhelper.EventTitleQuery;
+import edu.temple.dmhelper.R;
+import edu.temple.dmhelper.SessionsQuery;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 
@@ -309,13 +306,15 @@ public class WarhornActivity extends AppCompatActivity implements EventInfoFragm
             return;
         }
         String slug = myEvents.get(eventName);
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm"); // Quoted "Z" to indicate UTC, no timezone offset
+        String now = df.format(new Date());
         Log.d("Apollo", "Attempting to query with this slug: " + slug);
-        apolloClient.query(new SessionsQuery(slug))
+        apolloClient.query(new SessionsQuery(slug, now))
                 .enqueue(new ApolloCall.Callback<SessionsQuery.Data>() {
                     @Override
                     public void onResponse(@NotNull com.apollographql.apollo.api.Response<SessionsQuery.Data> response) {
                         //Log.d("Apollo", response.getData().sessions.nodes.toArray()[0].toString());
-                        List<SessionsQuery.Node> sessions = response.getData().sessions.nodes;
+                        List<SessionsQuery.Node> sessions = response.getData().sessions().nodes();
                         Message msg = Message.obtain();
                         Bundle data = new Bundle();
                         data.putSerializable("Sessions", (Serializable) sessions);
@@ -341,7 +340,7 @@ public class WarhornActivity extends AppCompatActivity implements EventInfoFragm
                     public void onResponse(@NotNull com.apollographql.apollo.api.Response<EventTitleQuery.Data> response) {
                         //Log.d("Apollo", response.getData().toString());
                         Message msg = Message.obtain();
-                        String messageContents[] = {response.getData().event.title, slug};
+                        String messageContents[] = {response.getData().event().title(), slug};
                         msg.obj = messageContents;
                         EventTitleHandler.sendMessage(msg);
                     }

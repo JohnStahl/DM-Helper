@@ -2,36 +2,22 @@ package edu.temple.dmhelper;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.fragment.app.Fragment;
 
 import android.app.PendingIntent;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
 import net.openid.appauth.AuthState;
-import net.openid.appauth.AuthorizationException;
-import net.openid.appauth.AuthorizationRequest;
-import net.openid.appauth.AuthorizationResponse;
 import net.openid.appauth.AuthorizationService;
-import net.openid.appauth.AuthorizationServiceConfiguration;
-import net.openid.appauth.ResponseTypeValues;
-import net.openid.appauth.TokenResponse;
 
 import org.json.JSONException;
 
 import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
 import android.bluetooth.BluetoothDevice;
-import android.content.Intent;
-import android.os.Bundle;
-import android.util.Log;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import android.widget.TextView;
 
+import edu.temple.dmhelper.Warhorn.WarhornActivity;
 import edu.temple.dmhelper.bluetooth.DiscoveryActivity;
 
 public class MainActivity extends AppCompatActivity {
