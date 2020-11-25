@@ -129,12 +129,16 @@ public class EventInfoFragment extends Fragment implements AdapterView.OnItemSel
         sessionViews = new ArrayList<>();
         currentSessions = sessions;
 
-        for(SessionsQuery.Node session : sessions){
+        Session session;
+        String coverArtUrl;
+        View sessionView;
+        for(int i = 0; i < sessions.size(); i++){
             //Log.d(TAG, "Adding view");
+            session = new Session(sessions.get(i));
             //Create View for each session
-            View sessionView = createSessionView(session);
+            sessionView = createSessionView(session);
             //Add image view and url to our map, which will be used to download picture in seperate thread
-            String coverArtUrl = session.scenarioOffering().scenario().coverArtUrl();
+            coverArtUrl = session.pictureURL;
             if(coverArtUrl != null && coverArtUrl.length() > 0) {
                 urls.add(coverArtUrl);
                 sessionViews.add(sessionView);
@@ -143,44 +147,24 @@ public class EventInfoFragment extends Fragment implements AdapterView.OnItemSel
             }
             //Add created view to our linear layout in the scroll view
             sessionList.addView(sessionView);
+            //Add listener to allow user to view more details about the session when clicked on
+            sessionView.setOnClickListener(new SessionClickedListener(session));
         }
         //Thread that will go through and add all of the cover art pictures to our sessions
-        new ImageDownloadThread(urls).start();
+        new ImageDownloadThread(urls, PictureLoadingHandler).start();
     }
 
-    private View createSessionView(SessionsQuery.Node session){
-        //Create all of our text fields as strings
-        String campaignName, scenarioName, availablePlayerSeats, availableGMSeats, time;
-
-        //Following fields may be null; need to be checked before assignment
-        if(session.scenarioOffering() != null && session.scenarioOffering().scenario() != null &&
-                session.scenarioOffering().scenario().campaign() != null &&
-                session.scenarioOffering().scenario().campaign().name() != null) {
-            campaignName = "Campaign: " + session.scenarioOffering().scenario().campaign().name();
-        }else {
-            campaignName = "No campaign name given";
-        }
-        if(session.scenarioOffering().scenario().name() != null)
-            scenarioName = "Scenario: " + session.scenarioOffering().scenario().name();
-        else
-            scenarioName = "No Scenario name given";
-        if(session.slot() != null)
-            time = session.slot().startsAt().toString() + "-" + session.slot().endsAt().toString();
-        else
-            time = "No time given";
-        //Following fields will never be null
-        availablePlayerSeats = "Player seats available: " + session.availablePlayerSeats();
-        availableGMSeats = "GM seats available: " + session.availableGmSeats();
+    private View createSessionView(Session session){
 
         //Create View from layout file
         ConstraintLayout sessionView = (ConstraintLayout) getActivity().getLayoutInflater().inflate(R.layout.session, sessionList, false);
 
         //Set text to display information about the session
-        ((TextView)sessionView.findViewById(R.id.CampaignName)).setText(campaignName);
-        ((TextView)sessionView.findViewById(R.id.ScenarioName)).setText(scenarioName);
-        ((TextView)sessionView.findViewById(R.id.PlayerSeats)).setText(availablePlayerSeats);
-        ((TextView)sessionView.findViewById(R.id.GMSeats)).setText(availableGMSeats);
-        ((TextView)sessionView.findViewById(R.id.Time)).setText(time);
+        ((TextView)sessionView.findViewById(R.id.CampaignName)).setText(session.campaign);
+        ((TextView)sessionView.findViewById(R.id.ScenarioName)).setText(session.scenario);
+        ((TextView)sessionView.findViewById(R.id.PlayerSeats)).setText(session.playerSeats);
+        ((TextView)sessionView.findViewById(R.id.GMSeats)).setText(session.gmSeats);
+        ((TextView)sessionView.findViewById(R.id.Time)).setText(session.time);
 
         //Return the newly made view
         return sessionView;
@@ -201,6 +185,7 @@ public class EventInfoFragment extends Fragment implements AdapterView.OnItemSel
     public interface GraphQLListener{
         void startEventDialogue();
         void querySessions(String eventName);
+        void viewSessionDetails(Session session);
     }
 
     public class SpinnerAdapter extends BaseAdapter {
@@ -252,28 +237,15 @@ public class EventInfoFragment extends Fragment implements AdapterView.OnItemSel
         }
     }
 
-    public class ImageDownloadThread extends Thread{
-        ArrayList<String> urls;
+    private class SessionClickedListener implements View.OnClickListener {
+        Session session;
 
-        public ImageDownloadThread(ArrayList<String> urls){
-            this.urls = urls;
+        public SessionClickedListener(Session session){
+            this.session = session;
         }
         @Override
-        public void run() {
-            for(int i = 0; i < urls.size(); i++){
-                try {
-                    URL url = new URL(urls.get(i));
-                    Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-                    Message msg = Message.obtain();
-                    msg.obj = bmp;
-                    msg.arg1 = i;
-                    PictureLoadingHandler.sendMessage(msg);
-                }catch (MalformedURLException e) {
-                    Log.d(TAG, "Picture URL is invalid");
-                } catch (IOException e) {
-                    Log.d(TAG, "Unable to open stream from picture URL");
-                }
-            }
+        public void onClick(View view) {
+            mListener.viewSessionDetails(session);
         }
     }
 }

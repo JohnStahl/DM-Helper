@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Parcelable;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
@@ -55,7 +56,8 @@ import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 
 
-public class WarhornActivity extends AppCompatActivity implements EventInfoFragment.GraphQLListener, AddEventDialogue.EventAdder {
+public class WarhornActivity extends AppCompatActivity implements EventInfoFragment.GraphQLListener,
+        AddEventDialogue.EventAdder, SessionDetailsFragment.SessionDetailsListener {
     Handler EventTitleHandler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(@NonNull Message msg) {
@@ -344,6 +346,16 @@ public class WarhornActivity extends AppCompatActivity implements EventInfoFragm
                 });
     }
 
+    @Override
+    public void viewSessionDetails(Session session) {
+        Fragment SessionDetails = SessionDetailsFragment.newInstance(session);
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.Event_Info, SessionDetails)
+                .addToBackStack(null)
+                .commit();
+    }
+
     private void getEventName(final String slug){
         if(apolloClient == null){
             Log.d(TAG, "Unable to query at this time");
@@ -376,6 +388,11 @@ public class WarhornActivity extends AppCompatActivity implements EventInfoFragm
                 getEventName(slug);
             }
         }.start();
+    }
+
+    @Override
+    public void exitSessionDetails() {
+        getSupportFragmentManager().popBackStack();
     }
 
     //Class used to add authorization to each graphql query/mutation
