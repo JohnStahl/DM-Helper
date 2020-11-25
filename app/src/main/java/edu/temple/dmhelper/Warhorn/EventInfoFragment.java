@@ -147,8 +147,6 @@ public class EventInfoFragment extends Fragment implements AdapterView.OnItemSel
             }
             //Add created view to our linear layout in the scroll view
             sessionList.addView(sessionView);
-            //Add listener to allow user to view more details about the session when clicked on
-            sessionView.setOnClickListener(new SessionClickedListener(session));
         }
         //Thread that will go through and add all of the cover art pictures to our sessions
         new ImageDownloadThread(urls, PictureLoadingHandler).start();
@@ -165,6 +163,9 @@ public class EventInfoFragment extends Fragment implements AdapterView.OnItemSel
         ((TextView)sessionView.findViewById(R.id.PlayerSeats)).setText(session.playerSeats);
         ((TextView)sessionView.findViewById(R.id.GMSeats)).setText(session.gmSeats);
         ((TextView)sessionView.findViewById(R.id.Time)).setText(session.time);
+
+        //Add on click listener to details button
+        sessionView.findViewById(R.id.viewSession).setOnClickListener(new SessionClickedListener(session));
 
         //Return the newly made view
         return sessionView;
