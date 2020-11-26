@@ -47,10 +47,6 @@ public class Session implements Serializable {
         DateFormat desiredFormat = new SimpleDateFormat("EEE, d MMM yyyy HH:mm");
         Date start = ISO8601dateFormat.parse(startsAt);
         Date end = ISO8601dateFormat.parse(endsAt);
-        String time = desiredFormat.format(start);
-        time = time.concat(" - ");
-        time = time.concat(desiredFormat.format(end));
-        Log.d("Session", time);
-        return time;
+        return desiredFormat.format(start) + " - " + desiredFormat.format(end);
     }
 }
