@@ -1,13 +1,20 @@
 package edu.temple.dmhelper.Warhorn;
 
+import android.util.Log;
+
 import java.io.Serializable;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.util.Date;
 
 import edu.temple.dmhelper.SessionsQuery;
 
 public class Session implements Serializable {
     protected String campaign, scenario, playerSeats, gmSeats, notes, blurb, time, pictureURL, signupURL;
 
-    public Session(SessionsQuery.Node session){
+    public Session(SessionsQuery.Node session) {
         //Following fields may be null; need to be checked before assignment
         if(session.scenarioOffering() != null && session.scenarioOffering().scenario() != null &&
                 session.scenarioOffering().scenario().campaign() != null &&
@@ -19,7 +26,11 @@ public class Session implements Serializable {
             scenario = "Scenario: " + session.scenarioOffering().scenario().name();
         }else { scenario = "No Scenario name given"; }
         if(session.slot() != null) {
-            time = session.slot().startsAt().toString() + "-" + session.slot().endsAt().toString();
+            try {
+                time = formatTime(session.slot().startsAt().toString(), session.slot().endsAt().toString());
+            } catch (ParseException e) {
+                time = "No time given";
+            }
         }else{ time = "No time given"; }
 
         //Following fields will never be null
@@ -29,5 +40,17 @@ public class Session implements Serializable {
         notes = session.notes();
         blurb = session.scenarioOffering().scenario().blurb();
         signupURL = session.signupUrl();
+    }
+
+    private String formatTime(String startsAt, String endsAt) throws ParseException {
+        DateFormat ISO8601dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
+        DateFormat desiredFormat = new SimpleDateFormat("EEE, d MMM yyyy HH:mm");
+        Date start = ISO8601dateFormat.parse(startsAt);
+        Date end = ISO8601dateFormat.parse(endsAt);
+        String time = desiredFormat.format(start);
+        time = time.concat(" - ");
+        time = time.concat(desiredFormat.format(end));
+        Log.d("Session", time);
+        return time;
     }
 }
