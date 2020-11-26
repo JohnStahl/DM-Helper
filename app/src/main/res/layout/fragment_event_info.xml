@@ -13,8 +13,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/RemoveEvent"
-        app:layout_constraintVertical_weight="8">
+        app:layout_constraintTop_toBottomOf="@id/RemoveEvent">
 
         <LinearLayout
             android:id="@+id/SessionList"
@@ -28,40 +27,32 @@
 
     <Spinner
         android:id="@+id/CurrentEvent"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
         app:layout_constraintBottom_toTopOf="@+id/RemoveEvent"
         app:layout_constraintEnd_toStartOf="@+id/AddButton"
-        app:layout_constraintHorizontal_weight="8"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_weight="1" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/AddButton"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginEnd="5dp"
-        android:text="@string/AddButtonText"
-        app:layout_constraintBottom_toTopOf="@+id/RemoveEvent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_weight="2"
-        app:layout_constraintStart_toEndOf="@+id/CurrentEvent"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/AddEventButtonText"
+        app:layout_constraintBottom_toTopOf="@+id/Sessions"
+        app:layout_constraintEnd_toStartOf="@id/RemoveEvent"
+        app:layout_constraintTop_toBottomOf="@id/CurrentEvent"
         app:layout_constraintVertical_bias="0.013"
         app:layout_constraintVertical_weight="1" />
 
     <Button
         android:id="@+id/RemoveEvent"
         android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:text="Remove"
+        android:layout_height="wrap_content"
+        android:text="@string/RemoveEventButtonText"
         app:layout_constraintBottom_toTopOf="@id/Sessions"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_weight="2"
-        app:layout_constraintTop_toBottomOf="@id/CurrentEvent"
-        app:layout_constraintVertical_weight="1" />
+        app:layout_constraintTop_toBottomOf="@id/CurrentEvent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

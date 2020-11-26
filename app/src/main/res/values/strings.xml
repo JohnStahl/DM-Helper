@@ -13,7 +13,8 @@
     <string name="warhorn_auth_action">auth</string>
     <string name="already_authenticated">true</string>
     <string name="hello_blank_fragment">Blank</string>
-    <string name="AddButtonText">+ Add</string>
+    <string name="AddEventButtonText">+ Add Event</string>
+    <string name="RemoveEventButtonText">- Remove Event</string>
     <string name="EventDialogue">Please enter the event slug you wish to add</string>
     <string name="EventNotFound">Event could not be found. Please double check provided slug.</string>
     <string name="AddEvent">Add</string>
