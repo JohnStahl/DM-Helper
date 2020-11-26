@@ -355,6 +355,11 @@ public class WarhornActivity extends AppCompatActivity implements EventInfoFragm
         startActivity(intent);
     }
 
+    @Override
+    public void removeEvent(String eventName) {
+        myEvents.remove(eventName);
+    }
+
     private void getEventName(final String slug){
         if(apolloClient == null){
             Log.d(TAG, "Unable to query at this time");

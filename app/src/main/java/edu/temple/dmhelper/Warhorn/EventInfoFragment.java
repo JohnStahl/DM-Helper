@@ -60,6 +60,7 @@ public class EventInfoFragment extends Fragment implements AdapterView.OnItemSel
     LinearLayout sessionList;
     ArrayList<View> sessionViews;
     List<SessionsQuery.Node> currentSessions;
+    String currentEventName;
 
     public EventInfoFragment() {
         // Required empty public constructor
@@ -107,6 +108,12 @@ public class EventInfoFragment extends Fragment implements AdapterView.OnItemSel
             @Override
             public void onClick(View view) {
                 mListener.startEventDialogue();
+            }
+        });
+        view.findViewById(R.id.RemoveEvent).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                removeEvent(currentEventName);
             }
         });
         currentEvent = (Spinner) view.findViewById(R.id.CurrentEvent);
@@ -175,7 +182,15 @@ public class EventInfoFragment extends Fragment implements AdapterView.OnItemSel
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
         Log.d(TAG, events.get(i) + " was selected");
-        mListener.querySessions(events.get(i));
+        currentEventName = events.get(i);
+        mListener.querySessions(currentEventName);
+    }
+
+    private void removeEvent(String eventName){
+        events.remove(eventName);
+        spinnerAdapter.notifyDataSetChanged();
+        currentEvent.setSelection(0);
+        mListener.removeEvent(eventName);
     }
 
     @Override
@@ -187,6 +202,7 @@ public class EventInfoFragment extends Fragment implements AdapterView.OnItemSel
         void startEventDialogue();
         void querySessions(String eventName);
         void viewSessionDetails(Session session);
+        void removeEvent(String eventName);
     }
 
     public class SpinnerAdapter extends BaseAdapter {
