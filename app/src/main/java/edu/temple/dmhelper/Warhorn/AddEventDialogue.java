@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -65,6 +66,16 @@ public class AddEventDialogue extends DialogFragment {
             //Present error message to user
             dialogue.findViewById(R.id.errorMessage).setVisibility(View.VISIBLE);
         }
+        final TextView slugDescription = dialogue.findViewById(R.id.SlugInfo);
+        dialogue.findViewById(R.id.informationButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(slugDescription.getVisibility() == View.GONE)
+                    slugDescription.setVisibility(View.VISIBLE);
+                else
+                    slugDescription.setVisibility(View.GONE);
+            }
+        });
         final EditText slug = dialogue.findViewById(R.id.slug);
         builder.setView(dialogue)
                 .setPositiveButton(R.string.AddEvent, new DialogInterface.OnClickListener() {
