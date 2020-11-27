@@ -17,7 +17,7 @@ import android.widget.EditText;
  * Use the {@link InitiativeTrackerFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class InitiativeTrackerFragment extends Fragment {
+public class InitiativeTrackerFragment extends Fragment implements CharacterListFragment.CharacterListInterface{
 
 
     private CharacterList CHARACTER_LIST = new CharacterList();
@@ -83,5 +83,13 @@ public class InitiativeTrackerFragment extends Fragment {
         transaction.replace(R.id.characterListContainer, characterListFragment).commit();
 
         super.onViewCreated(view, savedInstanceState);
+    }
+
+    @Override
+    public void removeCharacter(int index) {
+        CHARACTER_LIST.remove(index);
+        Fragment characterListFragment = CharacterListFragment.newInstance(CHARACTER_LIST);
+        FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+        transaction.replace(R.id.characterListContainer, characterListFragment).commit();
     }
 }
