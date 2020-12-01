@@ -2,11 +2,13 @@ package edu.temple.dmhelper.Warhorn;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
 import android.content.ActivityNotFoundException;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -99,6 +101,7 @@ public class WarhornActivity extends AppCompatActivity implements EventInfoFragm
 
     Fragment EventInfo;
     Fragment UserInfo;
+    AlertDialog RemoveEventDialogue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -356,8 +359,24 @@ public class WarhornActivity extends AppCompatActivity implements EventInfoFragm
     }
 
     @Override
-    public void removeEvent(String eventName) {
-        myEvents.remove(eventName);
+    public void removeEvent(final String eventName) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Do you want to delete " + eventName + "?")
+                .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        myEvents.remove(eventName);
+                        ((EventInfoFragment)EventInfo).removeEvent(eventName);
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        RemoveEventDialogue.dismiss();
+                    }
+                });
+        RemoveEventDialogue = builder.create();
+        RemoveEventDialogue.show();
     }
 
     private void getEventName(final String slug){

@@ -113,7 +113,7 @@ public class EventInfoFragment extends Fragment implements AdapterView.OnItemSel
         view.findViewById(R.id.RemoveEvent).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                removeEvent(currentEventName);
+                mListener.removeEvent(currentEventName);
             }
         });
         currentEvent = (Spinner) view.findViewById(R.id.CurrentEvent);
@@ -186,11 +186,10 @@ public class EventInfoFragment extends Fragment implements AdapterView.OnItemSel
         mListener.querySessions(currentEventName);
     }
 
-    private void removeEvent(String eventName){
+    public void removeEvent(String eventName){
         events.remove(eventName);
         spinnerAdapter.notifyDataSetChanged();
         currentEvent.setSelection(0);
-        mListener.removeEvent(eventName);
     }
 
     @Override
