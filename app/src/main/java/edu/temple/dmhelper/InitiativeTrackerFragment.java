@@ -56,7 +56,7 @@ public class InitiativeTrackerFragment extends Fragment implements CharacterList
         v.findViewById(R.id.addButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CHARACTER_LIST.add(new Character(nameEditText.getText().toString(), Integer.parseInt(initiativeEditText.getText().toString())));
+                CHARACTER_LIST.add(new Initiative(nameEditText.getText().toString(), Integer.parseInt(initiativeEditText.getText().toString())));
                 Fragment characterListFragment = CharacterListFragment.newInstance(CHARACTER_LIST);
                 FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
                 transaction.replace(R.id.characterListContainer, characterListFragment).commit();

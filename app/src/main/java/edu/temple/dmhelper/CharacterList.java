@@ -1,7 +1,7 @@
 package edu.temple.dmhelper;
 import java.util.ArrayList;
 
-public class CharacterList extends ArrayList<Character> {
+public class CharacterList extends ArrayList<Initiative> {
     private int head;
 
     public CharacterList(){
@@ -14,7 +14,7 @@ public class CharacterList extends ArrayList<Character> {
      * while maintaining proper turn order.
      */
     @Override
-    public boolean add(Character character) {
+    public boolean add(Initiative character) {
         if (this.size() == 0){
             super.add(character);
             return true;
@@ -54,7 +54,7 @@ public class CharacterList extends ArrayList<Character> {
     }
 
     @Override
-    public Character remove(int index) {
+    public Initiative remove(int index) {
         if (index < 0 || index >= this.size()) return null;
 
         /*Head is being removed and is last in the list*/
@@ -84,7 +84,7 @@ public class CharacterList extends ArrayList<Character> {
     @Override
     public String toString() {
         String list = "";
-        for(Character c : this){
+        for(Initiative c : this){
             list = list + c.getInitiative() + " " + c.getName() + "\n";
         }
 

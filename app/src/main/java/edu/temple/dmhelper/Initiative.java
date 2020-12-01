@@ -2,18 +2,18 @@ package edu.temple.dmhelper;
 
 import java.util.UUID;
 
-public class Character {
+public class Initiative {
     private int initiative;
     private String name;
     private UUID id;
 
 
-    public Character(String name, int initiative){
+    public Initiative(String name, int initiative){
         this.name = name;
         this.initiative = initiative;
         this.id = UUID.randomUUID();
     }
-    public Character(String name, int initiative, UUID id){
+    public Initiative(String name, int initiative, UUID id){
         this.name = name;
         this.initiative = initiative;
         this.id = id;
@@ -26,7 +26,7 @@ public class Character {
      * @param character A character whose initiative you want to compare against.
      * @return True if <b>this</b> character has a higher initiative than the given character, false otherwise.
      */
-    public boolean goesBefore(Character character){
+    public boolean goesBefore(Initiative character){
         return this.initiative > character.initiative;
     }
 
