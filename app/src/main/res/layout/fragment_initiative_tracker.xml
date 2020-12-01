@@ -22,22 +22,22 @@
         android:id="@+id/initiativeTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
         android:text="@string/initiative"
+        app:layout_constraintBottom_toTopOf="@+id/initiativeEditText"
         app:layout_constraintEnd_toEndOf="@+id/initiativeEditText"
-        app:layout_constraintStart_toStartOf="@+id/initiativeEditText"
-        app:layout_constraintTop_toBottomOf="@+id/characterListContainer" />
+        app:layout_constraintStart_toStartOf="@+id/initiativeEditText" />
 
     <TextView
         android:id="@+id/nameTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
         android:text="@string/name"
+        app:layout_constraintBottom_toTopOf="@+id/nameEditText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/characterListContainer" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/addButton"
@@ -64,13 +64,11 @@
         android:id="@+id/nameEditText"
         android:layout_width="169dp"
         android:layout_height="45dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="16dp"
         android:inputType="textShortMessage"
         app:layout_constraintBottom_toTopOf="@+id/nextButton"
         app:layout_constraintEnd_toEndOf="@+id/nameTextView"
-        app:layout_constraintStart_toStartOf="@+id/nameTextView"
-        app:layout_constraintTop_toBottomOf="@+id/nameTextView" />
+        app:layout_constraintStart_toStartOf="@+id/nameTextView" />
 
     <EditText
         android:id="@+id/initiativeEditText"
