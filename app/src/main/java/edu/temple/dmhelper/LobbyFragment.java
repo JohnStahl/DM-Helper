@@ -4,9 +4,13 @@ import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -36,6 +40,12 @@ public class LobbyFragment extends Fragment {
     }
 
     private ActionInterface actionInterface;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -104,5 +114,22 @@ public class LobbyFragment extends Fragment {
 
     public ArrayList<Character> getCharacters() {
         return this.characterAdapter.getAll();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        if (this.actionInterface.isDm())
+            inflater.inflate(R.menu.lobby_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.makeDiscoverable) {
+            this.actionInterface.setDiscoverable(true);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }
