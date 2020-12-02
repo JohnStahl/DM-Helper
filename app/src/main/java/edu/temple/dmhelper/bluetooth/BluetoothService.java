@@ -51,6 +51,10 @@ public class BluetoothService extends Service {
         public void disconnect() {
             BluetoothService.this.disconnect();
         }
+
+        public void makeDiscoverable() { BluetoothService.this.makeDiscoverable(); }
+
+        public void stopDiscoverable() { BluetoothService.this.stopDiscoverable(); }
     }
 
     // Properties for server
@@ -167,5 +171,17 @@ public class BluetoothService extends Service {
             this.serverConnection.disconnect();
             this.serverConnection = null;
         }
+    }
+
+    void makeDiscoverable() {
+        Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 600);
+        startActivity(discoverableIntent);
+    }
+
+    void stopDiscoverable() {
+        Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 1);
+        startActivity(discoverableIntent);
     }
 }

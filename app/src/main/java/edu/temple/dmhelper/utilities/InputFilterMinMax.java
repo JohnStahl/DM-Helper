@@ -2,7 +2,6 @@ package edu.temple.dmhelper.utilities;
 
 import android.text.InputFilter;
 import android.text.Spanned;
-import android.util.Log;
 
 public class InputFilterMinMax implements InputFilter {
     private final int min;

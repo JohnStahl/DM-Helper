@@ -6,7 +6,6 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +20,7 @@ import java.util.ArrayList;
  * create an instance of this fragment.
  */
 public class LobbyFragment extends Fragment {
-    private CharacterAdapter characterAdapter;
+    private LobbyCharacterAdapter characterAdapter;
 
     public LobbyFragment() {
     }
@@ -42,9 +41,11 @@ public class LobbyFragment extends Fragment {
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
 
-        this.characterAdapter = new CharacterAdapter(context);
+        this.characterAdapter = new LobbyCharacterAdapter(context);
         if (context instanceof ActionInterface) {
             actionInterface = (ActionInterface) context;
+            if (actionInterface.isDm())
+                actionInterface.setDiscoverable(true);
         } else {
             throw new RuntimeException(context.getClass().getName() + " must implement ActionInterface.");
         }
@@ -70,6 +71,8 @@ public class LobbyFragment extends Fragment {
         startGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (actionInterface.isDm())
+                    actionInterface.setDiscoverable(false);
                 actionInterface.startGame(characterAdapter.getAll());
             }
         });
@@ -77,6 +80,8 @@ public class LobbyFragment extends Fragment {
         endGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (actionInterface.isDm())
+                    actionInterface.setDiscoverable(false);
                 actionInterface.endGame();
                 actionInterface.showMainMenu();
             }

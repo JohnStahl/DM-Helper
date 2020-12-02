@@ -1,7 +1,6 @@
 package edu.temple.dmhelper;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,11 +9,11 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class CharacterAdapter extends BaseAdapter {
+public class LobbyCharacterAdapter extends BaseAdapter {
     private final Context context;
     private final ArrayList<Character> characters;
 
-    public CharacterAdapter(Context context) {
+    public LobbyCharacterAdapter(Context context) {
         this.context = context;
         this.characters = new ArrayList<>();
     }
@@ -40,7 +39,7 @@ public class CharacterAdapter extends BaseAdapter {
                 LayoutInflater.from(context).inflate(R.layout.character, parent, false);
         Character character = getItem(position);
         ((TextView) root.findViewById(R.id.charactersName)).setText(character.getName());
-        ((TextView) root.findViewById(R.id.charactersInitiative)).setText(character.getInitiative());
+        ((TextView) root.findViewById(R.id.charactersInitiative)).setText(String.valueOf(character.getInitiative()));
         return root;
     }
 

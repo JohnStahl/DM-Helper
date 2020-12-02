@@ -7,9 +7,12 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import android.app.PendingIntent;
+import android.bluetooth.BluetoothAdapter;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
@@ -49,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements ActionInterface {
 
     private LobbyFragment lobbyFragment;
 
+    private boolean discoverable = false;
     private BluetoothService.BluetoothBinder btBinder = null;
     private boolean btServiceBound = false;
     private final ServiceConnection btServiceConn = new ServiceConnection() {
@@ -105,6 +109,12 @@ public class MainActivity extends AppCompatActivity implements ActionInterface {
             return true;
         }
     });
+    private final BroadcastReceiver scanModeChangedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,6 +132,7 @@ public class MainActivity extends AppCompatActivity implements ActionInterface {
         Intent bluetoothServiceIntent = new Intent(this, BluetoothService.class);
         startService(bluetoothServiceIntent);
         bindService(bluetoothServiceIntent, btServiceConn, Context.BIND_AUTO_CREATE);
+        registerReceiver(scanModeChangedReceiver, new IntentFilter(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED));
     }
 
     //Called by warhorn fragment to initialize login by user into their warhorn fragment
@@ -229,6 +240,16 @@ public class MainActivity extends AppCompatActivity implements ActionInterface {
                 Log.e(TAG, "Unable to start the server", e);
                 Toast.makeText(this, R.string.bluetooth_failed_to_start, Toast.LENGTH_LONG).show();
             }
+        }
+    }
+
+    @Override
+    public void setDiscoverable(boolean discoverable) {
+        if (btBinder == null) return;
+        if (discoverable) {
+            this.btBinder.makeDiscoverable();
+        } else {
+            this.btBinder.stopDiscoverable();
         }
     }
 
