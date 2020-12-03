@@ -4,9 +4,14 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.Random;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -15,50 +20,258 @@ import android.view.ViewGroup;
  */
 public class DiceRollerFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    final int MAX_DICE = 25;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    /*d4, d6, d8, d10, d12, d20, d100 */
+    int[] dieCounts = {0,0,0,0,0,0,0};
+    TextView[] dieTextViews;
+    TextView rollResultsTextView;
+    Random rand;
 
     public DiceRollerFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment DiceRollerFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static DiceRollerFragment newInstance(String param1, String param2) {
+
+    public static DiceRollerFragment newInstance() {
         DiceRollerFragment fragment = new DiceRollerFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
+
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_dice_roller, container, false);
+        View v = inflater.inflate(R.layout.fragment_dice_roller, container, false);
+        rand = new Random(System.currentTimeMillis()); //Make sure we have a different seed each time
+
+        rollResultsTextView = v.findViewById(R.id.rollResultsTextView);
+        rollResultsTextView.setMovementMethod(new ScrollingMovementMethod());
+        dieTextViews = new TextView[7];
+        dieTextViews[0] = v.findViewById(R.id.d4Count);
+        dieTextViews[1] = v.findViewById(R.id.d6Count);
+        dieTextViews[2] = v.findViewById(R.id.d8Count);
+        dieTextViews[3] = v.findViewById(R.id.d10Count);
+        dieTextViews[4] = v.findViewById(R.id.d12Count);
+        dieTextViews[5] = v.findViewById(R.id.d20Count);
+        dieTextViews[6] = v.findViewById(R.id.d100Count);
+
+        v.findViewById(R.id.rollButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //TODO: Add dice roll sound effect
+                String roll = rollDice();
+
+                /*If the textview isn't empty add a new line*/
+                if (!rollResultsTextView.getText().toString().equals("")) rollResultsTextView.append("\n");
+
+                rollResultsTextView.append(roll);
+            }
+        });
+
+        /*Decrement Buttons*/
+
+        v.findViewById(R.id.d4Dec).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                decrementDie(0);
+            }
+        });
+
+        v.findViewById(R.id.d6Dec).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                decrementDie(1);
+            }
+        });
+
+        v.findViewById(R.id.d8Dec).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                decrementDie(2);
+            }
+        });
+
+        v.findViewById(R.id.d10Dec).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                decrementDie(3);
+            }
+        });
+
+        v.findViewById(R.id.d12Dec).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                decrementDie(4);
+            }
+        });
+
+        v.findViewById(R.id.d20Dec).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                decrementDie(5);
+            }
+        });
+
+        v.findViewById(R.id.d100Dec).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                decrementDie(6);
+            }
+        });
+
+        /*Increment Buttons*/
+
+        v.findViewById(R.id.d4Inc).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                incrementDie(0);
+            }
+        });
+
+        v.findViewById(R.id.d6Inc).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                incrementDie(1);
+            }
+        });
+
+        v.findViewById(R.id.d8Inc).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                incrementDie(2);
+            }
+        });
+
+        v.findViewById(R.id.d10Inc).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                incrementDie(3);
+            }
+        });
+
+        v.findViewById(R.id.d12Inc).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                incrementDie(4);
+            }
+        });
+
+        v.findViewById(R.id.d20Inc).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                incrementDie(5);
+            }
+        });
+
+        v.findViewById(R.id.d100Inc).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                incrementDie(6);
+            }
+        });
+
+
+        return v;
+    }
+
+    /**
+     * Picks random numbers corresponding to the dice specified by the user and returns the results
+     * @return A string containing the results of each individual die roll as well as their total
+     */
+    public String rollDice(){
+        StringBuilder result = new StringBuilder();
+        int total = 0;
+
+        for(int i = 0; i < dieCounts[0]; i++){ //d4
+            int r = rand.nextInt(4) + 1;
+            if (total > 0) result.append(" + ");
+            result.append(r);
+            total += r;
+        }
+
+        for(int i = 0; i < dieCounts[1]; i++){ //d6
+            int r = rand.nextInt(6) + 1;
+            if (total > 0) result.append(" + ");
+            result.append(r);
+            total += r;
+        }
+
+        for(int i = 0; i < dieCounts[2]; i++){ //d8
+            int r = rand.nextInt(8) + 1;
+            if (total > 0) result.append(" + ");
+            result.append(r);
+            total += r;
+        }
+
+        for(int i = 0; i < dieCounts[3]; i++){ //d10
+            int r = rand.nextInt(10) + 1;
+            if (total > 0) result.append(" + ");
+            result.append(r);
+            total += r;
+        }
+
+        for(int i = 0; i < dieCounts[4]; i++){ //d12
+            int r = rand.nextInt(12) + 1;
+            if (total > 0) result.append(" + ");
+            result.append(r);
+            total += r;
+        }
+
+        for(int i = 0; i < dieCounts[5]; i++){ //d20
+            int r = rand.nextInt(20) + 1;
+            if (total > 0) result.append(" + ");
+            result.append(r);
+            total += r;
+        }
+
+        for(int i = 0; i < dieCounts[6]; i++){ //d100
+            int r = rand.nextInt(100) + 1;
+            if (total > 0) result.append(" + ");
+            result.append(r);
+            total += r;
+        }
+
+        result.append(" = " + total);
+        return result.toString();
+    }
+
+    /**
+     * Adds one additional die of the corresponding value to the dice being rolled. Checks to ensure
+     * the total number of dice being rolled does not exceed MAX_DICE.
+     * Array order: d4, d6, d8, d10, d12, d20, d100
+     * @param index The index of the dieCounts array that corresponds with the number of dice rolled
+     */
+    public void incrementDie(int index){
+        int sum = 0;
+        for(int i : dieCounts){
+            sum += i;
+            if (sum >= MAX_DICE){
+                Toast.makeText(getActivity(),"Reached maximum number of dice",Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
+        dieCounts[index]++;
+        dieTextViews[index].setText("" + dieCounts[index]);
+    }
+
+    /**
+     * Removes one die of the corresponding value from the dice being rolled. Checks to ensure a
+     * negative number of dice are not being rolled.
+     * Array order: d4, d6, d8, d10, d12, d20, d100
+     * @param index The index of the dieCounts array that corresponds with the number of dice rolled
+     */
+    public void decrementDie(int index){
+        if (dieCounts[index] <= 0) return;
+
+        dieCounts[index]--;
+        dieTextViews[index].setText("" + dieCounts[index]);
     }
 }

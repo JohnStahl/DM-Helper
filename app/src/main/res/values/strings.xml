@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">DM Helper</string>
-
+  
+    <string name="roll_button">Roll</string>
+    <string name="login_button_name">Login</string>
+  
     <string name="login_button_name">Warhorn Login</string>
     <string name="host_url">https://dm-helper.netlify.app</string>
     <string name="redirect_url">https://dm-helper.netlify.app</string>
