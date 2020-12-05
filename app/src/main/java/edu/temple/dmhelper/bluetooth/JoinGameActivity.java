@@ -5,16 +5,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.text.InputFilter;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.UUID;
 
 import edu.temple.dmhelper.Character;
@@ -42,13 +38,8 @@ public class JoinGameActivity extends AppCompatActivity {
         int max = getResources().getInteger(R.integer.initiative_max);
         initiativeField.setFilters(new InputFilter[]{ new InputFilterMinMax(min, max)});
 
-        if (device == null) {
-            Log.e(TAG, "EXTRA_DEVICE extra must not be null");
-            finish();
-            return;
-        }
-
-        ((TextView) findViewById(R.id.device)).setText(device.getName());
+        String name = device == null ? "Unknown device" : device.getName();
+        ((TextView) findViewById(R.id.device)).setText(name);
 
         findViewById(R.id.joinButton).setOnClickListener(new View.OnClickListener() {
             @Override

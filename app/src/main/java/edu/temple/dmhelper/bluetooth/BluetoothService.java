@@ -58,38 +58,9 @@ public class BluetoothService extends Service {
     }
 
     // Properties for server
-    private volatile boolean acceptClients = true;
     private BluetoothServerSocket serverSocket = null;
-    private final List<BluetoothConnection> clients = new ArrayList<>();
-    private final Thread clientAcceptor = new Thread() {
-        @Override
-        public void run() {
-            if (!connected || !server) return;
-
-            while (acceptClients) {
-                BluetoothSocket socket;
-                try {
-                    socket = serverSocket.accept();
-                } catch (IOException ex) {
-                    Log.e(TAG, "Failed to accept client connection", ex);
-                    break;
-                }
-
-                if (socket == null) continue;
-
-                try {
-                    BluetoothDevice device = socket.getRemoteDevice();
-                    Log.d(TAG, "Opening connection to the client " + device.getName() + " (" + device.getAddress() + ")");
-                    BluetoothConnection conn = new BluetoothConnection(socket, device, handler, true);
-                    clients.add(conn);
-                    conn.start();
-                } catch (IOException ex) {
-                    Log.e(TAG, "Failed to open connection to client", ex);
-                    break;
-                }
-            }
-        }
-    };
+    private final ArrayList<BluetoothConnection> clients = new ArrayList<>();
+    private ClientAcceptor clientAcceptor;
 
     // Properties for client
     private BluetoothConnection serverConnection;
@@ -115,22 +86,23 @@ public class BluetoothService extends Service {
             server = true;
             connected = true;
             this.serverSocket = this.btAdapter.listenUsingRfcommWithServiceRecord("DM's Device", SERVICE_ID);
+            this.clientAcceptor = new ClientAcceptor(this.serverSocket, this.handler, this.clients);
             this.clientAcceptor.start();
         }
     }
 
     void stopAcceptingClients() {
-        this.acceptClients = false;
+        this.clientAcceptor.interrupt();
     }
 
     void stopServer() throws IOException {
         if (connected && server) {
             connected = false;
-            acceptClients = false;
-            this.serverSocket.close();
-            this.serverSocket = null;
+            this.stopAcceptingClients();
             for (BluetoothConnection conn : clients) conn.disconnect();
             clients.clear();
+            this.serverSocket.close();
+            this.serverSocket = null;
         }
     }
 
