@@ -10,6 +10,7 @@ import androidx.test.uiautomator.UiSelector;
 
 public class ChromeLogIn {
 
+    //Handles all UI calls for authenticating in google chrome for our application
     public static void login() throws UiObjectNotFoundException {
         boolean firstAuthentication = true;
         String webURL = null;

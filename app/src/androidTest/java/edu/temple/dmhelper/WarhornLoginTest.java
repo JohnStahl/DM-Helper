@@ -40,7 +40,7 @@ public class WarhornLoginTest {
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
 
     @Test
-    public void warhornLoginTest() throws UiObjectNotFoundException {
+    public void warhornLoginTest() throws UiObjectNotFoundException, InterruptedException {
         ViewInteraction appCompatButton = onView(
                 allOf(withId(R.id.warhorn_login), withText("Login"),
                         childAtPosition(
@@ -81,6 +81,8 @@ public class WarhornLoginTest {
                         withParent(withParent(withId(R.id.Event_Info))),
                         isDisplayed()));
         scrollView.check(matches(isDisplayed()));
+
+        Thread.sleep(3000);
     }
 
     private static Matcher<View> childAtPosition(

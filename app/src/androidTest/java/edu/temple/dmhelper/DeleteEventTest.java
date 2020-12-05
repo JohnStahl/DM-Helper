@@ -67,6 +67,8 @@ public class DeleteEventTest {
                         isDisplayed()));
         appCompatButton2.perform(click());
 
+        Thread.sleep(2000);
+
         ViewInteraction appCompatEditText = onView(
                 allOf(withId(R.id.slug),
                         childAtPosition(
@@ -77,6 +79,8 @@ public class DeleteEventTest {
                         isDisplayed()));
         appCompatEditText.perform(replaceText("indy-dnd"), closeSoftKeyboard());
 
+        Thread.sleep(2000);
+
         ViewInteraction appCompatButton3 = onView(
                 allOf(withId(android.R.id.button1), withText("Add"),
                         childAtPosition(
@@ -86,7 +90,7 @@ public class DeleteEventTest {
                                 3)));
         appCompatButton3.perform(scrollTo(), click());
 
-        Thread.sleep(5000);
+        Thread.sleep(2000);
 
         ViewInteraction appCompatButton4 = onView(
                 allOf(withId(R.id.RemoveEvent), withText("- Remove Event"),
@@ -98,6 +102,8 @@ public class DeleteEventTest {
                         isDisplayed()));
         appCompatButton4.perform(click());
 
+        Thread.sleep(2000);
+
         ViewInteraction appCompatButton5 = onView(
                 allOf(withId(android.R.id.button1), withText("Confirm"),
                         childAtPosition(
@@ -107,7 +113,7 @@ public class DeleteEventTest {
                                 3)));
         appCompatButton5.perform(scrollTo(), click());
 
-        Thread.sleep(3000);
+        Thread.sleep(2000);
     }
 
     private static Matcher<View> childAtPosition(
