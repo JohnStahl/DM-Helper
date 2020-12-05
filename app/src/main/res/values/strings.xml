@@ -12,6 +12,17 @@
     <string name="access_token">VT9oeVDJxbAAi4xfCN9bH8BD</string>
     <string name="warhorn_auth_action">auth</string>
     <string name="already_authenticated">true</string>
+    <string name="hello_blank_fragment">Blank</string>
+    <string name="AddEventButtonText">+ Add Event</string>
+    <string name="RemoveEventButtonText">- Remove Event</string>
+    <string name="EventDialogue">Please enter the event slug you wish to add</string>
+    <string name="EventNotFound">Event could not be found. Please double check provided slug.</string>
+    <string name="AddEvent">Add</string>
+    <string name="CancelEvent">Cancel</string>
+    <string name="EventsFile">Events</string>
+    <string name="SlugExplanation">
+        A slug is the last part of a url that uniquely identifies a page.For instance, in
+        https://warhorn.net/events/siege-of-agrad the slug would be "'siege-of-agrad'"</string>
 
     <string name="refresh">Refresh</string>
 
