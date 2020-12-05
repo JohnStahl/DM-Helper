@@ -161,6 +161,8 @@ public class EventInfoFragment extends Fragment implements AdapterView.OnItemSel
 
     private View createSessionView(Session session){
 
+        if(getActivity() == null) return null;
+
         //Create View from layout file
         ConstraintLayout sessionView = (ConstraintLayout) getActivity().getLayoutInflater().inflate(R.layout.session, sessionList, false);
 
@@ -189,7 +191,10 @@ public class EventInfoFragment extends Fragment implements AdapterView.OnItemSel
     public void removeEvent(String eventName){
         events.remove(eventName);
         spinnerAdapter.notifyDataSetChanged();
-        currentEvent.setSelection(0);
+        if(currentEvent.getAdapter().getCount() > 0)
+            currentEvent.setSelection(0);
+        else
+            sessionList.removeAllViews();
     }
 
     @Override
