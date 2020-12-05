@@ -126,7 +126,6 @@ public class EventInfoFragment extends Fragment implements AdapterView.OnItemSel
 
     public void updateEventSpinner(String eventName){
         spinnerAdapter.addEvent(eventName);
-        spinnerAdapter.notifyDataSetChanged();
     }
 
     public void displaySessions(List<SessionsQuery.Node> sessions){
@@ -189,12 +188,13 @@ public class EventInfoFragment extends Fragment implements AdapterView.OnItemSel
     }
 
     public void removeEvent(String eventName){
+        Log.d(TAG, "Removing this event: " + eventName);
         events.remove(eventName);
-        spinnerAdapter.notifyDataSetChanged();
-        if(currentEvent.getAdapter().getCount() > 0)
-            currentEvent.setSelection(0);
-        else
-            sessionList.removeAllViews();
+        spinnerAdapter.removeEvent(eventName);
+        sessionList.removeAllViews();
+        currentEvent.setSelection(0, true);
+        currentEventName = events.get(0);
+        mListener.querySessions(currentEventName);
     }
 
     @Override
@@ -210,26 +210,32 @@ public class EventInfoFragment extends Fragment implements AdapterView.OnItemSel
     }
 
     public class SpinnerAdapter extends BaseAdapter {
-        ArrayList<String> events;
+        ArrayList<String> adapterEvents;
         Context context;
 
         public SpinnerAdapter(Context context, ArrayList<String> events){
             this.context = context;
-            this.events = events;
+            this.adapterEvents = events;
         }
 
         public void addEvent(String eventName){
-            events.add(eventName);
+            adapterEvents.add(eventName);
+            notifyDataSetChanged();
+        }
+
+        public void removeEvent(String eventName){
+            adapterEvents.remove(eventName);
+            notifyDataSetChanged();
         }
 
         @Override
         public int getCount() {
-            return events.size();
+            return adapterEvents.size();
         }
 
         @Override
         public Object getItem(int i) {
-            return events.get(i);
+            return adapterEvents.get(i);
         }
 
         @Override
@@ -252,7 +258,7 @@ public class EventInfoFragment extends Fragment implements AdapterView.OnItemSel
             }else{
                 toReturn = (TextView)view;
             }
-            toReturn.setText(events.get(i));
+            toReturn.setText(adapterEvents.get(i));
             toReturn.setTextSize(20);
             return toReturn;
         }

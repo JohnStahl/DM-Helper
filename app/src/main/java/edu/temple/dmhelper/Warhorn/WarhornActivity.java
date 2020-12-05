@@ -405,12 +405,14 @@ public class WarhornActivity extends AppCompatActivity implements EventInfoFragm
 
     @Override
     public void addEvent(final String slug) {
-        new Thread(){
-            @Override
-            public void run() {
-                getEventName(slug);
-            }
-        }.start();
+        if(!myEvents.values().contains(slug)) {
+            new Thread() {
+                @Override
+                public void run() {
+                    getEventName(slug);
+                }
+            }.start();
+        }
     }
 
     //Class used to add authorization to each graphql query/mutation
