@@ -14,17 +14,18 @@ public class InputFilterMinMax implements InputFilter {
 
     @Override
     public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+        String raw = dest.toString() + source.toString();
+        if (raw.equals("-")) return null;
+        int input;
         try {
-            String raw = dest.toString() + source.toString();
-            if (raw.equals("-")) return null;
-            int input = Integer.parseInt(raw);
-            if (isInRange(min, max, input))
-                return null;
-        } catch (NumberFormatException ignored) { }
-        return "";
+            input = Integer.parseInt(raw);
+        } catch (NumberFormatException ignored) {
+            return "";
+        }
+        return isInRange(min, max, input) ? null : "";
     }
 
-    private boolean isInRange(int a, int b, int c) {
+    public boolean isInRange(int a, int b, int c) {
         return b > a ? c >= a && c <= b : c >= b && c <= a;
     }
 }
