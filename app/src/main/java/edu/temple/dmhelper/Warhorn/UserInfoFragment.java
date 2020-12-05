@@ -1,4 +1,4 @@
-package edu.temple.dmhelper;
+package edu.temple.dmhelper.Warhorn;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import edu.temple.dmhelper.R;
+
 public class UserInfoFragment extends Fragment {
 
     Handler PictureLoadingHandler = new Handler(new Handler.Callback() {
@@ -33,7 +35,6 @@ public class UserInfoFragment extends Fragment {
 
     private ImageView profilePicture;
 
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String NAME = "Name";
     private static final String EMAIL = "Email";
     private static final String PICTURE = "Picture";

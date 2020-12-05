@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="30dp">
+
+        <TextView
+            android:id="@+id/prompt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="5dp"
+            android:paddingVertical="5dp"
+            android:text="@string/EventDialogue"
+            android:textColor="@android:color/black"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"></TextView>
+
+        <ImageButton
+            android:id="@+id/informationButton"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginTop="5dp"
+            android:src="@drawable/information_icon"
+            app:layout_constraintStart_toEndOf="@+id/prompt"
+            app:layout_constraintTop_toTopOf="parent"></ImageButton>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/SlugInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="5"
+        android:paddingHorizontal="5dp"
+        android:paddingVertical="5dp"
+        android:text="@string/SlugExplanation"
+        android:visibility="gone">
+    </TextView>
+
+    <TextView
+        android:id="@+id/errorMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="5"
+        android:paddingHorizontal="5dp"
+        android:paddingVertical="5dp"
+        android:text="@string/EventNotFound"
+        android:textColor="#FF0000"
+        android:visibility="gone"></TextView>
+    <EditText
+        android:id="@+id/slug"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="5"
+        android:paddingVertical="5dp"
+        android:paddingHorizontal="5dp"
+        android:inputType="text">
+    </EditText>
+</LinearLayout>

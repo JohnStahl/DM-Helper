@@ -18,7 +18,7 @@
         android:theme="@style/AppTheme">
         <activity android:name=".bluetooth.JoinGameActivity"></activity>
 
-        <activity android:name=".WarhornActivity">
+        <activity android:name=".Warhorn.WarhornActivity">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 

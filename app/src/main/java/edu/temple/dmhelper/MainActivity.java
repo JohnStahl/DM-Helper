@@ -14,6 +14,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -34,6 +35,11 @@ import java.util.List;
 
 import edu.temple.dmhelper.bluetooth.BluetoothConnection;
 import edu.temple.dmhelper.bluetooth.BluetoothService;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+
+import edu.temple.dmhelper.Warhorn.WarhornActivity;
+
 import edu.temple.dmhelper.bluetooth.DiscoveryActivity;
 import edu.temple.dmhelper.bluetooth.JoinGameActivity;
 import edu.temple.dmhelper.bluetooth.message.BluetoothMessage;
