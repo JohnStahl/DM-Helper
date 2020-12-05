@@ -20,8 +20,9 @@
     <string name="AddEvent">Add</string>
     <string name="CancelEvent">Cancel</string>
     <string name="EventsFile">Events</string>
-    <string name="SlugExplanation">A slug is the last part of a url that uniquely identifies a page.
-    For instance, in https://warhorn.net/events/siege-of-agrad the slug would be "'siege-of-agrad'"</string>
+    <string name="SlugExplanation">
+        A slug is the last part of a url that uniquely identifies a page.For instance, in
+        https://warhorn.net/events/siege-of-agrad the slug would be "'siege-of-agrad'"</string>
 
     <string name="refresh">Refresh</string>
 

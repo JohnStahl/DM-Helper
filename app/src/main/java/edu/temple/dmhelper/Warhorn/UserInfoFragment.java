@@ -35,7 +35,6 @@ public class UserInfoFragment extends Fragment {
 
     private ImageView profilePicture;
 
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String NAME = "Name";
     private static final String EMAIL = "Email";
     private static final String PICTURE = "Picture";

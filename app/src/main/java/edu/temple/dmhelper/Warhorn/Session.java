@@ -11,6 +11,7 @@ import java.util.Date;
 
 import edu.temple.dmhelper.SessionsQuery;
 
+//Class converts a session query into a collection of strings that will be displayed to the user
 public class Session implements Serializable {
     protected String campaign, scenario, playerSeats, gmSeats, notes, blurb, time, pictureURL, signupURL;
 
