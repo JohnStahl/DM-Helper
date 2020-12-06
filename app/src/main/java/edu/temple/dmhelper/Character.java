@@ -1,8 +1,15 @@
 package edu.temple.dmhelper;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import androidx.annotation.NonNull;
+
+import java.io.Serializable;
+import java.util.Objects;
 import java.util.UUID;
 
-public class Character {
+public class Character implements Serializable {
     private int initiative;
     private String name;
     private UUID id;
@@ -70,5 +77,28 @@ public class Character {
      */
     public void setId(UUID id) {
         this.id = id;
+    }
+
+    @Override
+    @NonNull
+    public String toString() {
+        return "Character{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", initiative=" + initiative +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Character character = (Character) o;
+        return id.equals(character.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
