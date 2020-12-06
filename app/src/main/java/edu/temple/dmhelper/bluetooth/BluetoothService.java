@@ -148,12 +148,14 @@ public class BluetoothService extends Service {
     void makeDiscoverable() {
         Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
         discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 600);
+        discoverableIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(discoverableIntent);
     }
 
     void stopDiscoverable() {
         Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
         discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 1);
+        discoverableIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(discoverableIntent);
     }
 }
