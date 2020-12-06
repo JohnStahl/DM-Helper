@@ -2,7 +2,7 @@ package edu.temple.dmhelper.bluetooth.message;
 
 import edu.temple.dmhelper.Character;
 
-public class PlayerLeftMessage extends Message {
+public class PlayerLeftMessage extends BluetoothMessage {
     public static final String TYPE = "player_left";
 
     private final Character player;

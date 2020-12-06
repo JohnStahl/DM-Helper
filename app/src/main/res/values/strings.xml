@@ -1,7 +1,9 @@
 <resources>
     <string name="app_name">DM Helper</string>
 
-    <string name="login_button_name">Login</string>
+    <string name="roll_button">Roll</string>
+
+    <string name="login_button_name">Warhorn Login</string>
     <string name="host_url">https://dm-helper.netlify.app</string>
     <string name="redirect_url">https://dm-helper.netlify.app</string>
     <string name="auth_end_point">https://warhorn.net/oauth/authorize</string>
@@ -12,6 +14,17 @@
     <string name="access_token">VT9oeVDJxbAAi4xfCN9bH8BD</string>
     <string name="warhorn_auth_action">auth</string>
     <string name="already_authenticated">true</string>
+    <string name="hello_blank_fragment">Blank</string>
+    <string name="AddEventButtonText">+ Add Event</string>
+    <string name="RemoveEventButtonText">- Remove Event</string>
+    <string name="EventDialogue">Please enter the event slug you wish to add</string>
+    <string name="EventNotFound">Event could not be found. Please double check provided slug.</string>
+    <string name="AddEvent">Add</string>
+    <string name="CancelEvent">Cancel</string>
+    <string name="EventsFile">Events</string>
+    <string name="SlugExplanation">
+        A slug is the last part of a url that uniquely identifies a page.For instance, in
+        https://warhorn.net/events/siege-of-agrad the slug would be "'siege-of-agrad'"</string>
 
     <string name="refresh">Refresh</string>
 
@@ -19,6 +32,8 @@
     <string name="bluetooth_finished_discover">Select the DM\'s device</string>
     <string name="bluetooth_no_devices">Unable to find any devices to connect to</string>
     <string name="bluetooth_failed_to_enable">Unable to enable bluetooth</string>
+    <string name="bluetooth_failed_to_connect">Failed to connect to the device %s</string>
+    <string name="bluetooth_failed_to_start">Failed to connect to start the server</string>
 
     <string name="cannot_request_location">Unable to discover devices without location permissions</string>
     <string name="location_rationale_title">Oops!</string>
@@ -27,8 +42,23 @@
         permission we are unable to find the DM\'s device to establish a connection.
     </string>
 
+
     <string name="initiative">Initiative</string>
     <string name="name">Name</string>
     <string name="add">Add</string>
     <string name="next">Next</string>
+        <string name="join_game_title">Joining game</string>
+    <string name="character_name">Character Name</string>
+    <string name="character_initiative">Character Initiative</string>
+
+    <string name="lobby_title">Lobby</string>
+    <string name="start_game">Start Game</string>
+    <string name="end_game">End Game</string>
+    <string name="make_discoverable">Make Discoverable</string>
+
+    <string name="main_menu_title">DM Helper Main Menu</string>
+    <string name="join_game">Join Game</string>
+    <string name="create_game">Create Game</string>
+    <string name="dice_roller">Dice Roller</string>
+    <string name="warhorn">Warhorn</string>
 </resources>

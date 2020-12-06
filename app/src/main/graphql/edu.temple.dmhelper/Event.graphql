@@ -3,3 +3,80 @@ query EventTitle($slug: String!){
         title
     }
 }
+
+query Sessions($event: String!, $after: ISO8601DateTime!){
+    sessions(events: [$event], startsAfter: $after){
+        nodes{
+            availableGmSeats
+            availablePlayerSeats
+            notes
+            scenarioOffering{
+                scenario{
+                    name
+                    campaign{
+                        name
+                    }
+                    blurb
+                    coverArtUrl
+                }
+            }
+            signupUrl
+            slot{
+                startsAt
+                endsAt
+            }
+        }
+    }
+}
+
+mutation createSlot($slot: CreateSlotInput!){
+    createSlot(input: $slot){
+        errors{
+            message
+        }
+        slot{
+            id
+        }
+    }
+}
+
+query scenarioIDs($slug: String!){
+    event(slug: $slug){
+        slots{
+            nodes{
+                sessions{
+                    nodes{
+                        scenarioOffering{
+                            id
+                            scenario{
+                                name
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+mutation createSession($sessionInfo: CreateSessionInput!){
+    createSession(input: $sessionInfo){
+        session{
+            slot{
+                startsAt
+                endsAt
+            }
+            scenarioOffering{
+                scenario{
+                    name
+                    campaign{
+                        name
+                    }
+                    blurb
+                }
+            }
+            notes
+            signupUrl
+        }
+    }
+}
