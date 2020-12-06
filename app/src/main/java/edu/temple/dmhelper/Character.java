@@ -21,7 +21,7 @@ public class Character implements Serializable {
     }
 
     public Character(String name, int initiative) {
-        this(name, initiative, null);
+        this(name, initiative, UUID.randomUUID());
     }
 
     /**
