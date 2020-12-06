@@ -16,6 +16,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Parcelable;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -360,7 +361,8 @@ public class WarhornActivity extends AppCompatActivity implements EventInfoFragm
 
     @Override
     public void removeEvent(final String eventName) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(
+                new ContextThemeWrapper(this, R.style.DialogStyle));
         builder.setMessage("Do you want to delete " + eventName + "?")
                 .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
                     @Override

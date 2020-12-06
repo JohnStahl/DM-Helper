@@ -16,10 +16,9 @@
             android:paddingHorizontal="5dp"
             android:paddingVertical="5dp"
             android:text="@string/EventDialogue"
-            android:textColor="@android:color/black"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"></TextView>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageButton
             android:id="@+id/informationButton"
@@ -28,7 +27,7 @@
             android:layout_marginTop="5dp"
             android:src="@drawable/information_icon"
             app:layout_constraintStart_toEndOf="@+id/prompt"
-            app:layout_constraintTop_toTopOf="parent"></ImageButton>
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -52,7 +51,7 @@
         android:paddingVertical="5dp"
         android:text="@string/EventNotFound"
         android:textColor="#FF0000"
-        android:visibility="gone"></TextView>
+        android:visibility="gone" />
     <EditText
         android:id="@+id/slug"
         android:layout_width="match_parent"
@@ -60,6 +59,7 @@
         android:layout_weight="5"
         android:paddingVertical="5dp"
         android:paddingHorizontal="5dp"
+        android:textColor="@color/text"
         android:inputType="text">
     </EditText>
 </LinearLayout>
