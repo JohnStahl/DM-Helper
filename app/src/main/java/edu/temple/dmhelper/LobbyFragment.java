@@ -116,6 +116,10 @@ public class LobbyFragment extends Fragment {
         return this.characterAdapter.getAll();
     }
 
+    public void clearCharacters() {
+        characterAdapter.clear();
+    }
+
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         if (this.actionInterface.isDm())

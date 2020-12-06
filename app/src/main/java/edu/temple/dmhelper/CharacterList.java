@@ -1,7 +1,10 @@
 package edu.temple.dmhelper;
-import java.util.ArrayList;
+import androidx.annotation.NonNull;
 
-public class CharacterList extends ArrayList<Initiative> {
+import java.util.ArrayList;
+import java.util.Collection;
+
+public class CharacterList extends ArrayList<Character> {
     private int head;
 
     public CharacterList(){
@@ -14,7 +17,7 @@ public class CharacterList extends ArrayList<Initiative> {
      * while maintaining proper turn order.
      */
     @Override
-    public boolean add(Initiative character) {
+    public boolean add(Character character) {
         if (this.size() == 0){
             super.add(character);
             return true;
@@ -54,7 +57,13 @@ public class CharacterList extends ArrayList<Initiative> {
     }
 
     @Override
-    public Initiative remove(int index) {
+    public boolean addAll(@NonNull Collection<? extends Character> c) {
+        for (Character character : c) add(character);
+        return true;
+    }
+
+    @Override
+    public Character remove(int index) {
         if (index < 0 || index >= this.size()) return null;
 
         /*Head is being removed and is last in the list*/
@@ -84,7 +93,7 @@ public class CharacterList extends ArrayList<Initiative> {
     @Override
     public String toString() {
         String list = "";
-        for(Initiative c : this){
+        for(Character c : this){
             list = list + c.getInitiative() + " " + c.getName() + "\n";
         }
 

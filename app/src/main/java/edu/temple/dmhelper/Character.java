@@ -20,6 +20,10 @@ public class Character implements Serializable {
         this.id = id;
     }
 
+    public Character(String name, int initiative) {
+        this(name, initiative, null);
+    }
+
     /**
      * Compares the initiative of two characters. Will only return true if the current Character has
      * a higher initiative than the one being passed to it as a parameter.
@@ -82,11 +86,7 @@ public class Character implements Serializable {
     @Override
     @NonNull
     public String toString() {
-        return "Character{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", initiative=" + initiative +
-                '}';
+        return "" + this.initiative + " " + this.name;
     }
 
     @Override

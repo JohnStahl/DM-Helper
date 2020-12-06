@@ -42,7 +42,7 @@ public class WarhornLoginTest {
     @Test
     public void warhornLoginTest() throws UiObjectNotFoundException, InterruptedException {
         ViewInteraction appCompatButton = onView(
-                allOf(withId(R.id.warhorn_login), withText("Login"),
+                allOf(withId(R.id.warhornButton), withText("Warhorn"),
                         childAtPosition(
                                 childAtPosition(
                                         withId(android.R.id.content),

@@ -63,4 +63,9 @@ public class LobbyCharacterAdapter extends BaseAdapter {
     public ArrayList<Character> getAll() {
         return characters;
     }
+
+    public void clear() {
+        this.characters.clear();
+        this.notifyDataSetInvalidated();
+    }
 }

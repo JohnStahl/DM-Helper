@@ -1,5 +1,6 @@
 package edu.temple.dmhelper;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -20,20 +21,35 @@ import android.widget.EditText;
 public class InitiativeTrackerFragment extends Fragment implements CharacterListFragment.CharacterListInterface{
 
 
-    private CharacterList CHARACTER_LIST = new CharacterList();
+    private CharacterList CHARACTER_LIST;
     private static final String CHARACTER_LIST_KEY = "characterlist";
     EditText nameEditText;
     EditText initiativeEditText;
+
+    private ActionInterface actionInterface;
 
 
     public InitiativeTrackerFragment() {
         // Required empty public constructor
     }
 
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof ActionInterface) {
+            actionInterface = (ActionInterface) context;
+            if (actionInterface.isDm())
+                actionInterface.setDiscoverable(true);
+        } else {
+            throw new RuntimeException(context.getClass().getName() + " must implement ActionInterface.");
+        }
+    }
 
-    public static InitiativeTrackerFragment newInstance() {
+    public static InitiativeTrackerFragment newInstance(CharacterList characterList) {
         InitiativeTrackerFragment fragment = new InitiativeTrackerFragment();
-
+        Bundle args = new Bundle();
+        args.putSerializable(CHARACTER_LIST_KEY, characterList);
+        fragment.setArguments(args);
         return fragment;
     }
 
@@ -53,45 +69,72 @@ public class InitiativeTrackerFragment extends Fragment implements CharacterList
         nameEditText = v.findViewById(R.id.nameEditText);
         initiativeEditText = v.findViewById(R.id.initiativeEditText);
 
+        if (actionInterface.isDm())
+            v.findViewById(R.id.dmControls).setVisibility(View.VISIBLE);
+
         v.findViewById(R.id.addButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (nameEditText.getText().toString().length() == 0 || initiativeEditText.getText().toString().length() == 0) return;
 
-                CHARACTER_LIST.add(new Initiative(nameEditText.getText().toString(), Integer.parseInt(initiativeEditText.getText().toString())));
-                Fragment characterListFragment = CharacterListFragment.newInstance(CHARACTER_LIST);
-                FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-                transaction.replace(R.id.characterListContainer, characterListFragment).commit();
+                Character character = new Character(nameEditText.getText().toString(), Integer.parseInt(initiativeEditText.getText().toString()));
+                actionInterface.addCharacter(character);
+                CHARACTER_LIST.add(character);
+                updateCharacterList();
             }
         });
 
         v.findViewById(R.id.nextButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CHARACTER_LIST.nextTurn();
-                Fragment characterListFragment = CharacterListFragment.newInstance(CHARACTER_LIST);
-                FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-                transaction.replace(R.id.characterListContainer, characterListFragment).commit();
+                handleNextRound();
+            }
+        });
+
+        v.findViewById(R.id.endGameButton2).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                actionInterface.endGame();
             }
         });
 
         return  v;
     }
 
+    public void handleNextRound() {
+        CHARACTER_LIST.nextTurn();
+        if (actionInterface.isDm())
+            actionInterface.sendNextRound();
+        this.updateCharacterList();
+    }
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        Fragment characterListFragment = new CharacterListFragment();
+        this.updateCharacterList();
+        super.onViewCreated(view, savedInstanceState);
+    }
+
+    private void updateCharacterList() {
+        Fragment characterListFragment = CharacterListFragment.newInstance(CHARACTER_LIST);
         FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
         transaction.replace(R.id.characterListContainer, characterListFragment).commit();
-
-        super.onViewCreated(view, savedInstanceState);
     }
 
     @Override
     public void removeCharacter(int index) {
-        CHARACTER_LIST.remove(index);
-        Fragment characterListFragment = CharacterListFragment.newInstance(CHARACTER_LIST);
-        FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-        transaction.replace(R.id.characterListContainer, characterListFragment).commit();
+        Character character = CHARACTER_LIST.remove(index);
+        if (actionInterface.isDm())
+            actionInterface.removeCharacter(character);
+        this.updateCharacterList();
+    }
+
+    public void removeCharacter(Character character) {
+        CHARACTER_LIST.remove(character);
+        this.updateCharacterList();
+    }
+
+    public void addCharacter(Character player) {
+        CHARACTER_LIST.add(player);
+        this.updateCharacterList();
     }
 }

@@ -11,5 +11,8 @@ public interface ActionInterface {
     void showDiceRoller();
     void showWarhorn();
     void showMainMenu();
+    void sendNextRound();
+    void addCharacter(Character character);
+    void removeCharacter(Character character);
     boolean isDm();
 }

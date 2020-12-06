@@ -45,7 +45,7 @@ public class ChangeEventTest {
     @Test
     public void changeEventTest() throws UiObjectNotFoundException, InterruptedException {
         ViewInteraction appCompatButton = onView(
-                allOf(withId(R.id.warhorn_login), withText("Login"),
+                allOf(withId(R.id.warhornButton), withText("Warhorn"),
                         childAtPosition(
                                 childAtPosition(
                                         withId(android.R.id.content),
