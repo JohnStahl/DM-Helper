@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/diceRollerMenuItem"
+        android:icon="@drawable/ic_dice"
+        android:title="@string/dice_roller"
+        app:showAsAction="always" />
+</menu>

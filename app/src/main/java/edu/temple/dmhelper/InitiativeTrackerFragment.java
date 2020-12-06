@@ -9,6 +9,9 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -56,6 +59,7 @@ public class InitiativeTrackerFragment extends Fragment implements CharacterList
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         if (getArguments() != null) {
             CHARACTER_LIST = (CharacterList) getArguments().getSerializable(CHARACTER_LIST_KEY);
         }
@@ -136,5 +140,21 @@ public class InitiativeTrackerFragment extends Fragment implements CharacterList
     public void addCharacter(Character player) {
         CHARACTER_LIST.add(player);
         this.updateCharacterList();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.initiative_tracker_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.diceRollerMenuItem) {
+            actionInterface.showDiceRoller();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }
