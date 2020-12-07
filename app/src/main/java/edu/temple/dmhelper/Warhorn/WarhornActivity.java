@@ -16,6 +16,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Parcelable;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -153,7 +154,7 @@ public class WarhornActivity extends AppCompatActivity implements EventInfoFragm
             getMyEvents();
     }
 
-    public void getMyEvents() {
+    private void getMyEvents() {
         File file = new File(getFilesDir(), getString(R.string.EventsFile));
         if(file.exists() && file.length() > 0){
             try {
@@ -171,7 +172,7 @@ public class WarhornActivity extends AppCompatActivity implements EventInfoFragm
         }
     }
 
-    public void writeMyEvents(){
+    private void writeMyEvents(){
         File file = new File(getFilesDir(), getString(R.string.EventsFile));
         try {
             String path = file.getPath();
@@ -193,7 +194,7 @@ public class WarhornActivity extends AppCompatActivity implements EventInfoFragm
     }
 
     //Extracts Authorization response from intent and sends to getUserToken()
-    public void handleIntent(Intent intent){
+    private void handleIntent(Intent intent){
         if(intent.getAction().equals((Intent.ACTION_VIEW))){
             authState = new AuthState();
             authService = new AuthorizationService(this);
@@ -215,7 +216,7 @@ public class WarhornActivity extends AppCompatActivity implements EventInfoFragm
 
     //Grabs user token and stores it in authState from successful authorization response
     //Then calls getUserInfo() to use acquired token to obtain relevant user information
-    public void getUserToken(AuthorizationResponse response){
+    private void getUserToken(AuthorizationResponse response){
         authService.performTokenRequest(
                 response.createTokenExchangeRequest(),
                 new AuthorizationService.TokenResponseCallback() {
@@ -237,7 +238,7 @@ public class WarhornActivity extends AppCompatActivity implements EventInfoFragm
     }
 
     //Using obtained access token requests user info from warhorn and updates UI with response
-    public void getUserInfo(){
+    private void getUserInfo(){
         authState.performActionWithFreshTokens(authService, new AuthState.AuthStateAction() {
             @Override
             public void execute(@Nullable final String accessToken, @Nullable final String idToken,
@@ -360,7 +361,8 @@ public class WarhornActivity extends AppCompatActivity implements EventInfoFragm
 
     @Override
     public void removeEvent(final String eventName) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(
+                new ContextThemeWrapper(this, R.style.DialogStyle));
         builder.setMessage("Do you want to delete " + eventName + "?")
                 .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
                     @Override

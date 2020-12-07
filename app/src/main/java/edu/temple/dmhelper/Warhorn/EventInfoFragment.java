@@ -2,7 +2,6 @@ package edu.temple.dmhelper.Warhorn;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -16,7 +15,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
@@ -24,9 +22,6 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -55,7 +50,7 @@ public class EventInfoFragment extends Fragment implements AdapterView.OnItemSel
     GraphQLListener mListener;
 
     ArrayList<String> events;
-    Spinner currentEvent;
+    Spinner currentEventSpinner;
     SpinnerAdapter spinnerAdapter;
     LinearLayout sessionList;
     ArrayList<View> sessionViews;
@@ -116,10 +111,10 @@ public class EventInfoFragment extends Fragment implements AdapterView.OnItemSel
                 mListener.removeEvent(currentEventName);
             }
         });
-        currentEvent = (Spinner) view.findViewById(R.id.CurrentEvent);
+        currentEventSpinner = (Spinner) view.findViewById(R.id.CurrentEvent);
         spinnerAdapter = new SpinnerAdapter(getContext(), events);
-        currentEvent.setAdapter(spinnerAdapter);
-        currentEvent.setOnItemSelectedListener(this);
+        currentEventSpinner.setAdapter(spinnerAdapter);
+        currentEventSpinner.setOnItemSelectedListener(this);
         sessionList = view.findViewById(R.id.Sessions).findViewById(R.id.SessionList);
         return view;
     }
@@ -192,7 +187,7 @@ public class EventInfoFragment extends Fragment implements AdapterView.OnItemSel
         events.remove(eventName);
         spinnerAdapter.removeEvent(eventName);
         sessionList.removeAllViews();
-        currentEvent.setSelection(0, true);
+        currentEventSpinner.setSelection(0, true);
         currentEventName = events.get(0);
         mListener.querySessions(currentEventName);
     }

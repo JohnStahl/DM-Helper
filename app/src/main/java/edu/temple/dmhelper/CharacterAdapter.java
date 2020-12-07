@@ -41,7 +41,7 @@ public class CharacterAdapter extends BaseAdapter {
         }
 
         nameTextView = convertView.findViewById(R.id.nameTextView);
-        nameTextView.setText(((Initiative) getItem(position)).getName());
+        nameTextView.setText(((Character) getItem(position)).getName());
 
         return convertView;
     }

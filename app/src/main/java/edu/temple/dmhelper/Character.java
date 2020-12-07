@@ -1,22 +1,27 @@
 package edu.temple.dmhelper;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import androidx.annotation.NonNull;
+
+import java.io.Serializable;
+import java.util.Objects;
 import java.util.UUID;
 
-public class Initiative {
+public class Character implements Serializable {
     private int initiative;
     private String name;
     private UUID id;
 
-
-    public Initiative(String name, int initiative){
-        this.name = name;
-        this.initiative = initiative;
-        this.id = UUID.randomUUID();
-    }
-    public Initiative(String name, int initiative, UUID id){
+    public Character(String name, int initiative, UUID id){
         this.name = name;
         this.initiative = initiative;
         this.id = id;
+    }
+
+    public Character(String name, int initiative) {
+        this(name, initiative, UUID.randomUUID());
     }
 
     /**
@@ -26,7 +31,7 @@ public class Initiative {
      * @param character A character whose initiative you want to compare against.
      * @return True if <b>this</b> character has a higher initiative than the given character, false otherwise.
      */
-    public boolean goesBefore(Initiative character){
+    public boolean goesBefore(Character character){
         return this.initiative > character.initiative;
     }
 
@@ -78,8 +83,22 @@ public class Initiative {
         this.id = id;
     }
 
-
+    @Override
+    @NonNull
     public String toString() {
         return "" + this.initiative + " " + this.name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Character character = (Character) o;
+        return id.equals(character.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

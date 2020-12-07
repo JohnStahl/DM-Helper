@@ -79,8 +79,6 @@ public class WarhornSessionUnitTests {
                 "No campaign name given", testNullSession.campaign);
         assertEquals("Null scenario name not caught",
                 "No scenario name given", testNullSession.scenario);
-        assertEquals("Null notes not caught",
-                "No notes given", testNullSession.notes);
     }
 
     @Test

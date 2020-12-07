@@ -35,8 +35,6 @@ import java.util.List;
 
 import edu.temple.dmhelper.bluetooth.BluetoothConnection;
 import edu.temple.dmhelper.bluetooth.BluetoothService;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
 
 import edu.temple.dmhelper.Warhorn.WarhornActivity;
 
@@ -57,8 +55,8 @@ public class MainActivity extends AppCompatActivity implements ActionInterface {
     public static final int REQUEST_JOIN_GAME = 1002;
 
     private LobbyFragment lobbyFragment;
+    private InitiativeTrackerFragment initiativeTrackerFragment = null;
 
-    private boolean discoverable = false;
     private BluetoothService.BluetoothBinder btBinder = null;
     private boolean btServiceBound = false;
     private final ServiceConnection btServiceConn = new ServiceConnection() {
@@ -92,23 +90,32 @@ public class MainActivity extends AppCompatActivity implements ActionInterface {
             } else { // Message from server to client
                 switch (msg.getType()) {
                     case PlayerJoinMessage.TYPE:
-                        lobbyFragment.addCharacter(((PlayerJoinMessage) msg).getPlayer());
+                        if (initiativeTrackerFragment == null)
+                            lobbyFragment.addCharacter(((PlayerJoinMessage) msg).getPlayer());
+                        else
+                            initiativeTrackerFragment.addCharacter(((PlayerJoinMessage) msg).getPlayer());
                         break;
                     case PlayerLeftMessage.TYPE:
-                        lobbyFragment.removeCharacter(((PlayerLeftMessage) msg).getPlayer());
+                        if (initiativeTrackerFragment == null)
+                            lobbyFragment.removeCharacter(((PlayerJoinMessage) msg).getPlayer());
+                        else
+                            initiativeTrackerFragment.removeCharacter(((PlayerJoinMessage) msg).getPlayer());
                         break;
                     case PlayerListMessage.TYPE:
                         lobbyFragment.addCharacters(((PlayerListMessage) msg).getPlayers());
                         break;
                     case GameStartMessage.TYPE:
-                        // TODO: Show Initiative Tracker
+                        showInitiativeTracker(lobbyFragment.getCharacters());
+                        lobbyFragment.clearCharacters();
                         break;
                     case GameEndMessage.TYPE:
                         btBinder.disconnect();
                         showMainMenu();
+                        initiativeTrackerFragment = null;
                         break;
                     case NextRoundMessage.TYPE:
-                        // TODO: Handle next round
+                        if (initiativeTrackerFragment != null)
+                            initiativeTrackerFragment.handleNextRound();
                         break;
                 }
             }
@@ -230,6 +237,17 @@ public class MainActivity extends AppCompatActivity implements ActionInterface {
                 .commit();
     }
 
+    public void showInitiativeTracker(List<Character> characters) {
+        CharacterList characterList = new CharacterList();
+        characterList.addAll(characters);
+        initiativeTrackerFragment = InitiativeTrackerFragment.newInstance(characterList);
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.frameLayout, initiativeTrackerFragment)
+                .addToBackStack(null)
+                .commit();
+    }
+
     @Override
     public void joinGame() {
         startDiscoveryActivity();
@@ -264,7 +282,8 @@ public class MainActivity extends AppCompatActivity implements ActionInterface {
         if (btServiceBound) {
             btBinder.stopAcceptingClients();
             btBinder.sendMessage(new GameStartMessage());
-            // TODO: Show Initiative tracker
+            showInitiativeTracker(characters);
+            lobbyFragment.clearCharacters();
         }
     }
 
@@ -274,6 +293,8 @@ public class MainActivity extends AppCompatActivity implements ActionInterface {
             try {
                 btBinder.sendMessage(new GameEndMessage());
                 btBinder.stopServer();
+                showMainMenu();
+                initiativeTrackerFragment = null;
             } catch (IOException e) {
                 Log.e(TAG, "Unable to stop server", e);
             }
@@ -305,6 +326,25 @@ public class MainActivity extends AppCompatActivity implements ActionInterface {
                 .replace(R.id.frameLayout, new MainMenuFragment())
                 .addToBackStack(null)
                 .commit();
+    }
+
+    @Override
+    public void sendNextRound() {
+        if (btServiceBound && isDm()) {
+            btBinder.sendMessage(new NextRoundMessage());
+        }
+    }
+
+    public void addCharacter(Character character) {
+        if (btServiceBound && isDm()) {
+            btBinder.sendMessage(new PlayerJoinMessage(character));
+        }
+    }
+
+    public void removeCharacter(Character character) {
+        if (btServiceBound && isDm()) {
+            btBinder.sendMessage(new PlayerLeftMessage(character));
+        }
     }
 
     @Override
