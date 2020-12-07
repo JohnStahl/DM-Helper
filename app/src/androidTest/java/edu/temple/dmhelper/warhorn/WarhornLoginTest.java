@@ -1,20 +1,16 @@
-package edu.temple.dmhelper;
+package edu.temple.dmhelper.warhorn;
 
 
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 
 import androidx.test.espresso.ViewInteraction;
+import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.filters.LargeTest;
-import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 import androidx.test.runner.AndroidJUnit4;
-import androidx.test.uiautomator.UiDevice;
-import androidx.test.uiautomator.UiObject;
 import androidx.test.uiautomator.UiObjectNotFoundException;
-import androidx.test.uiautomator.UiSelector;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -22,6 +18,9 @@ import org.hamcrest.TypeSafeMatcher;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import edu.temple.dmhelper.MainActivity;
+import edu.temple.dmhelper.R;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
@@ -42,12 +41,13 @@ public class WarhornLoginTest {
     @Test
     public void warhornLoginTest() throws UiObjectNotFoundException, InterruptedException {
         ViewInteraction appCompatButton = onView(
-                allOf(withId(R.id.warhornButton), withText("Warhorn"),
+                allOf(ViewMatchers.withId(R.id.warhornButton), withText("Warhorn"),
                         childAtPosition(
-                                childAtPosition(
-                                        withId(android.R.id.content),
-                                        0),
-                                0),
+                                allOf(withId(R.id.constraintLayout),
+                                        childAtPosition(
+                                                withId(R.id.frameLayout),
+                                                0)),
+                                1),
                         isDisplayed()));
         appCompatButton.perform(click());
 

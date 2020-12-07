@@ -1,4 +1,4 @@
-package edu.temple.dmhelper;
+package edu.temple.dmhelper.warhorn;
 
 
 import android.view.View;
@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 
 import androidx.test.espresso.ViewInteraction;
+import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.filters.LargeTest;
 import androidx.test.rule.ActivityTestRule;
 import androidx.test.runner.AndroidJUnit4;
@@ -17,6 +18,10 @@ import org.hamcrest.TypeSafeMatcher;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import edu.temple.dmhelper.MainActivity;
+import edu.temple.dmhelper.R;
+import edu.temple.dmhelper.warhorn.ChromeLogIn;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
@@ -32,20 +37,21 @@ import static org.hamcrest.Matchers.is;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class AddEventTest {
+public class DeleteEventTest {
 
     @Rule
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
 
     @Test
-    public void addEventTest() throws UiObjectNotFoundException, InterruptedException  {
+    public void deleteEventTest() throws UiObjectNotFoundException, InterruptedException {
         ViewInteraction appCompatButton = onView(
-                allOf(withId(R.id.warhornButton), withText("Warhorn"),
+                allOf(ViewMatchers.withId(R.id.warhornButton), withText("Warhorn"),
                         childAtPosition(
-                                childAtPosition(
-                                        withId(android.R.id.content),
-                                        0),
-                                0),
+                                allOf(withId(R.id.constraintLayout),
+                                        childAtPosition(
+                                                withId(R.id.frameLayout),
+                                                0)),
+                                1),
                         isDisplayed()));
         appCompatButton.perform(click());
 
@@ -61,6 +67,8 @@ public class AddEventTest {
                         isDisplayed()));
         appCompatButton2.perform(click());
 
+        Thread.sleep(2000);
+
         ViewInteraction appCompatEditText = onView(
                 allOf(withId(R.id.slug),
                         childAtPosition(
@@ -69,7 +77,7 @@ public class AddEventTest {
                                         0),
                                 3),
                         isDisplayed()));
-        appCompatEditText.perform(replaceText("invalid-slug"), closeSoftKeyboard());
+        appCompatEditText.perform(replaceText("indy-dnd"), closeSoftKeyboard());
 
         Thread.sleep(2000);
 
@@ -84,48 +92,26 @@ public class AddEventTest {
 
         Thread.sleep(2000);
 
-        ViewInteraction appCompatImageButton = onView(
-                allOf(withId(R.id.informationButton),
+        ViewInteraction appCompatButton4 = onView(
+                allOf(withId(R.id.RemoveEvent), withText("- Remove Event"),
                         childAtPosition(
                                 childAtPosition(
-                                        withClassName(is("android.widget.LinearLayout")),
-                                        0),
-                                1),
-                        isDisplayed()));
-        appCompatImageButton.perform(click());
-
-        Thread.sleep(2000);
-
-        ViewInteraction appCompatImageButton2 = onView(
-                allOf(withId(R.id.informationButton),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.LinearLayout")),
-                                        0),
-                                1),
-                        isDisplayed()));
-        appCompatImageButton2.perform(click());
-
-        ViewInteraction appCompatEditText2 = onView(
-                allOf(withId(R.id.slug),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(android.R.id.custom),
+                                        withId(R.id.Event_Info),
                                         0),
                                 3),
                         isDisplayed()));
-        appCompatEditText2.perform(replaceText("siege-of-agrad"), closeSoftKeyboard());
+        appCompatButton4.perform(click());
 
         Thread.sleep(2000);
 
-        ViewInteraction appCompatButton4 = onView(
-                allOf(withId(android.R.id.button1), withText("Add"),
+        ViewInteraction appCompatButton5 = onView(
+                allOf(withId(android.R.id.button1), withText("Confirm"),
                         childAtPosition(
                                 childAtPosition(
-                                        withClassName(is("android.widget.ScrollView")),
+                                        withId(R.id.buttonPanel),
                                         0),
                                 3)));
-        appCompatButton4.perform(scrollTo(), click());
+        appCompatButton5.perform(scrollTo(), click());
 
         Thread.sleep(2000);
     }
