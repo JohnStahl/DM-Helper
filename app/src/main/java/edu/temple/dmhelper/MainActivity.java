@@ -97,9 +97,9 @@ public class MainActivity extends AppCompatActivity implements ActionInterface {
                         break;
                     case PlayerLeftMessage.TYPE:
                         if (initiativeTrackerFragment == null)
-                            lobbyFragment.removeCharacter(((PlayerJoinMessage) msg).getPlayer());
+                            lobbyFragment.removeCharacter(((PlayerLeftMessage) msg).getPlayer());
                         else
-                            initiativeTrackerFragment.removeCharacter(((PlayerJoinMessage) msg).getPlayer());
+                            initiativeTrackerFragment.removeCharacter(((PlayerLeftMessage) msg).getPlayer());
                         break;
                     case PlayerListMessage.TYPE:
                         lobbyFragment.addCharacters(((PlayerListMessage) msg).getPlayers());
